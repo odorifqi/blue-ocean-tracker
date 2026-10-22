@@ -1,0 +1,243 @@
+/* ==========================================================================
+   Blue Ocean Tracker design tokens
+   Three tiers: primitives (raw palette) -> semantic (role-based) -> component.
+   Components only ever read semantic tokens, so themes swap one layer.
+   ========================================================================== */
+
+:root {
+  /* ---- Primitives: palette ---- */
+  --blue-50: #eef4ff;
+  --blue-100: #dbe7fe;
+  --blue-200: #bfd3fe;
+  --blue-300: #93b4fd;
+  --blue-400: #6090fa;
+  --blue-500: #3b6ef5;
+  --blue-600: #2554e0;
+  --blue-700: #1d43b8;
+  --blue-800: #1e3a8f;
+  --blue-900: #1c3271;
+  --blue-950: #131f45;
+
+  --slate-0: #ffffff;
+  --slate-25: #fbfcfd;
+  --slate-50: #f6f7f9;
+  --slate-100: #eceef2;
+  --slate-200: #dde1e8;
+  --slate-300: #c4cad4;
+  --slate-400: #9aa3b2;
+  --slate-500: #6b7587;
+  --slate-600: #4f586a;
+  --slate-700: #3b4252;
+  --slate-800: #262b36;
+  --slate-850: #1c2029;
+  --slate-900: #151820;
+  --slate-950: #0d0f14;
+
+  --sky-50: #ecf8ff; --sky-100: #d3efff; --sky-600: #0a7cc2; --sky-700: #0b659c; --sky-300: #7fcdf8;
+  --emerald-50: #ebfbf3; --emerald-100: #cff5e2; --emerald-600: #078a55; --emerald-700: #066f46; --emerald-300: #6ddcaa;
+  --amber-50: #fff8eb; --amber-100: #feecc7; --amber-600: #b45d06; --amber-700: #934a0b; --amber-300: #fbc35a;
+  --rose-50: #fff1f2; --rose-100: #ffe1e4; --rose-600: #d0233f; --rose-700: #ae1934; --rose-300: #fc9fae;
+  --stone-50: #f5f5f4; --stone-100: #e7e5e4; --stone-600: #57534e; --stone-700: #44403c; --stone-300: #c8c3bd;
+
+  /* ---- Primitives: type ---- */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-xs: 0.75rem;    /* 12 */
+  --text-sm: 0.8125rem;  /* 13 */
+  --text-md: 0.875rem;   /* 14  body */
+  --text-lg: 1rem;       /* 16 */
+  --text-xl: 1.25rem;    /* 20 */
+  --text-2xl: 1.5rem;    /* 24 */
+  --text-3xl: 2rem;      /* 32 */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --weight-regular: 420;
+  --weight-medium: 520;
+  --weight-semibold: 620;
+  --weight-bold: 700;
+  --tracking-tight: -0.015em;
+  --tracking-caps: 0.06em;
+
+  /* ---- Primitives: space (4px grid) ---- */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---- Primitives: shape & motion ---- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Entrances: blocks rise --motion-rise into place, --motion-stagger apart; chart bars grow over --duration-data. */
+  --duration-data: 480ms;
+  --motion-stagger: 50ms;
+  --motion-rise: 8px;
+
+  --z-sticky: 10;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+
+  --control-h-sm: 2rem;
+  --control-h-md: 2.375rem;
+  --control-h-lg: 2.75rem;
+}
+
+/* ---- Semantic tokens: light (default) ---- */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-canvas: var(--slate-50);
+  --bg-surface: var(--slate-0);
+  --bg-surface-raised: var(--slate-0);
+  --bg-subtle: var(--slate-50);
+  --bg-muted: var(--slate-100);
+  --bg-hover: color-mix(in oklab, var(--slate-100) 70%, transparent);
+  --bg-selected: var(--blue-50);
+  --bg-inverse: var(--slate-900);
+  --bg-overlay: rgb(13 15 20 / 0.45);
+
+  --fg-default: var(--slate-900);
+  --fg-muted: var(--slate-600);
+  --fg-subtle: var(--slate-500);
+  --fg-disabled: var(--slate-400);
+  --fg-inverse: var(--slate-0);
+  --fg-on-accent: #ffffff;
+
+  --border-default: var(--slate-200);
+  --border-strong: var(--slate-300);
+  --border-subtle: var(--slate-100);
+
+  --accent: var(--blue-600);
+  --accent-hover: var(--blue-700);
+  --accent-active: var(--blue-800);
+  --accent-subtle: var(--blue-50);
+  --accent-fg: var(--blue-700);
+  --focus-ring: color-mix(in oklab, var(--blue-500) 45%, transparent);
+
+  --danger: var(--rose-600);
+  --danger-hover: var(--rose-700);
+  --danger-subtle: var(--rose-50);
+  --danger-fg: var(--rose-700);
+  --warning-subtle: var(--amber-50);
+  --warning-fg: var(--amber-700);
+  --success-subtle: var(--emerald-50);
+  --success-fg: var(--emerald-700);
+
+  /* Status palette: bg / fg / dot */
+  --status-empty-bg: var(--slate-100);
+  --status-empty-fg: var(--slate-700);
+  --status-empty-dot: var(--slate-500);
+  --status-filled-bg: var(--sky-50);
+  --status-filled-fg: var(--sky-700);
+  --status-filled-dot: var(--sky-600);
+  --status-delivered-bg: var(--emerald-50);
+  --status-delivered-fg: var(--emerald-700);
+  --status-delivered-dot: var(--emerald-600);
+  --status-maintenance-bg: var(--amber-50);
+  --status-maintenance-fg: var(--amber-700);
+  --status-maintenance-dot: var(--amber-600);
+  --status-retired-bg: var(--rose-50);
+  --status-retired-fg: var(--rose-700);
+  --status-retired-dot: var(--rose-600);
+
+  --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-sm: 0 1px 3px rgb(16 24 40 / 0.08), 0 1px 2px rgb(16 24 40 / 0.04);
+  --shadow-md: 0 6px 16px -4px rgb(16 24 40 / 0.1), 0 2px 6px -2px rgb(16 24 40 / 0.06);
+  --shadow-lg: 0 20px 40px -12px rgb(16 24 40 / 0.22), 0 4px 10px -4px rgb(16 24 40 / 0.08);
+  --skeleton-base: var(--slate-100);
+  --skeleton-shine: var(--slate-50);
+
+  /* Toasts: solid fills with white text. Same in both themes; each clears 4.5:1. */
+  --toast-fg: #ffffff;
+  --toast-success-bg: var(--emerald-700); /* 6.2:1 */
+  --toast-error-bg: var(--rose-600);      /* 5.3:1 */
+  --toast-warning-bg: var(--amber-700);   /* 6.5:1 */
+  --toast-info-bg: var(--blue-600);       /* 6.1:1 */
+
+  /* Charts: one series hue, a receding neutral, and a single-hue sequential ramp. */
+}
+
+/* ---- Semantic tokens: dark ---- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-canvas: var(--slate-950);
+  --bg-surface: var(--slate-900);
+  --bg-surface-raised: var(--slate-850);
+  --bg-subtle: var(--slate-850);
+  --bg-muted: var(--slate-800);
+  --bg-hover: color-mix(in oklab, var(--slate-800) 70%, transparent);
+  --bg-selected: color-mix(in oklab, var(--blue-500) 16%, transparent);
+  --bg-inverse: var(--slate-50);
+  --bg-overlay: rgb(0 0 0 / 0.6);
+
+  --fg-default: var(--slate-50);
+  --fg-muted: var(--slate-300);
+  --fg-subtle: var(--slate-400);
+  --fg-disabled: var(--slate-600);
+  --fg-inverse: var(--slate-900);
+
+  --border-default: var(--slate-800);
+  --border-strong: var(--slate-700);
+  --border-subtle: var(--slate-850);
+
+  --accent: var(--blue-500);
+  --accent-hover: var(--blue-400);
+  --accent-active: var(--blue-300);
+  --accent-subtle: color-mix(in oklab, var(--blue-500) 16%, transparent);
+  --accent-fg: var(--blue-300);
+  --focus-ring: color-mix(in oklab, var(--blue-400) 55%, transparent);
+
+  --danger: var(--rose-600);
+  --danger-hover: #e2405a;
+  --danger-subtle: color-mix(in oklab, var(--rose-600) 16%, transparent);
+  --danger-fg: var(--rose-300);
+  --warning-subtle: color-mix(in oklab, var(--amber-600) 18%, transparent);
+  --warning-fg: var(--amber-300);
+  --success-subtle: color-mix(in oklab, var(--emerald-600) 18%, transparent);
+  --success-fg: var(--emerald-300);
+
+  --status-empty-bg: color-mix(in oklab, var(--slate-500) 20%, transparent);
+  --status-empty-fg: var(--slate-300);
+  --status-empty-dot: var(--slate-400);
+  --status-filled-bg: color-mix(in oklab, var(--sky-600) 20%, transparent);
+  --status-filled-fg: var(--sky-300);
+  --status-filled-dot: var(--sky-300);
+  --status-delivered-bg: color-mix(in oklab, var(--emerald-600) 20%, transparent);
+  --status-delivered-fg: var(--emerald-300);
+  --status-delivered-dot: var(--emerald-300);
+  --status-maintenance-bg: color-mix(in oklab, var(--amber-600) 20%, transparent);
+  --status-maintenance-fg: var(--amber-300);
+  --status-maintenance-dot: var(--amber-300);
+  --status-retired-bg: color-mix(in oklab, var(--rose-600) 20%, transparent);
+  --status-retired-fg: var(--rose-300);
+  --status-retired-dot: var(--rose-300);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 8px 20px -6px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  --skeleton-base: var(--slate-800);
+  --skeleton-shine: var(--slate-850);
+
+}
