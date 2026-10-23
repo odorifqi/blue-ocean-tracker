@@ -376,6 +376,29 @@
   .history__note td { display: block; padding: 0; background: none; }
 }
 
+/* ===== Status rules ===== */
+.rules__bar { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-default); background: var(--bg-subtle); color: var(--fg-muted); font-size: var(--text-sm); }
+.rules__bar svg { flex: none; margin-top: 2px; color: var(--fg-subtle); }
+.rules__bar strong { color: var(--fg-default); }
+.rules__card { overflow: hidden; }
+.rules__title { padding: var(--space-4) var(--space-5) var(--space-3); }
+.rules__scroll { overflow-x: auto; }
+.rules__statuses { table-layout: fixed; }
+.rules__statuses td { vertical-align: middle; }
+.rules__statuses .num, .rules__statuses th.num { text-align: right; }
+.rules__moves { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); margin: 0; padding: 0; list-style: none; }
+.rules__count { font-weight: var(--weight-semibold); color: var(--accent-fg); }
+.rules__count:hover { text-decoration: underline; }
+/* Phones: one block per status. Badge and count share the top line; the move list gets its column name back as a label. */
+@media (max-width: 760px) {
+  .rules__statuses tr { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2) var(--space-3); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border-subtle); }
+  .rules__statuses td { grid-column: 1 / -1; width: auto; min-width: 0; }
+  .rules__statuses td[data-label='Status'] { grid-column: 1; justify-self: start; }
+  .rules__statuses td[data-label='Cylinders'] { grid-column: 2; grid-row: 1; align-self: center; }
+  .rules__next { display: flex !important; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+  .rules__next::before { content: attr(data-label); flex-basis: 100%; color: var(--fg-subtle); font-size: var(--text-xs); }
+}
+
 /* ===== Lifecycle diagram ===== */
 .lifecycle { width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); }
 .lifecycle__edge { fill: none; stroke: var(--border-strong); stroke-width: 1.25; transition: stroke var(--duration-base); }

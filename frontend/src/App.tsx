@@ -6,6 +6,7 @@ import { ToastProvider } from './ds'
 import { CylinderDetailPage } from './features/cylinders/CylinderDetailPage'
 import { CylindersPage } from './features/cylinders/CylindersPage'
 import { ServerErrorProvider } from './features/cylinders/ServerError'
+import { StatusRulesPage } from './features/rules/StatusRulesPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ApiError } from './lib/api'
 
@@ -29,6 +30,7 @@ export function App({ mock }: { mock: boolean }) {
           { path: '/', element: <CylindersPage /> },
           { path: '/cylinders/:id', element: <CylinderDetailPage /> },
           { path: '/analytics', element: <AnalyticsPage /> },
+          { path: '/status-rules', element: <StatusRulesPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
