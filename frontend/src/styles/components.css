@@ -181,6 +181,31 @@
 .state__code { color: var(--fg-subtle); font-family: var(--font-mono); font-size: var(--text-xs); }
 .state__action { margin-top: var(--space-3); display: flex; gap: var(--space-2); }
 
+/* ===== Pagination ===== */
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+.pagination__info { color: var(--fg-muted); font-size: var(--text-sm); }
+.pagination__info strong { color: var(--fg-default); font-weight: var(--weight-semibold); }
+.pagination__controls { display: flex; align-items: center; gap: var(--space-1); }
+.pagination__size { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg-muted); margin-right: var(--space-3); }
+.pagination__pages { display: flex; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.pagination__page {
+  min-width: var(--control-h-sm); height: var(--control-h-sm); padding: 0 6px; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--fg-muted); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer;
+}
+.pagination__page:hover:not(:disabled) { background: var(--bg-hover); color: var(--fg-default); }
+.pagination__page[aria-current='page'] { background: var(--accent-subtle); color: var(--accent-fg); font-weight: var(--weight-semibold); }
+.pagination__gap { display: grid; place-items: center; width: 20px; color: var(--fg-subtle); }
+@media (max-width: 640px) {
+  .pagination { justify-content: center; }
+  .pagination__pages li:not(:has([aria-current])) { display: none; }
+  .pagination__gap { display: none; }
+  .pagination__size > span { display: none; }
+}
+
+/* ===== Truncate ===== */
+.truncate { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.truncate--2 { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+
 /* ===== Card ===== */
 .card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); box-shadow: var(--shadow-xs); }
 
