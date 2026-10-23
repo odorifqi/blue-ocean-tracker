@@ -183,3 +183,75 @@
   --chart-seq-min: var(--blue-50);
   --chart-seq-max: var(--blue-700);
 }
+
+/* ---- Semantic tokens: dark ---- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-canvas: var(--slate-950);
+  --bg-surface: var(--slate-900);
+  --bg-surface-raised: var(--slate-850);
+  --bg-subtle: var(--slate-850);
+  --bg-muted: var(--slate-800);
+  --bg-hover: color-mix(in oklab, var(--slate-800) 70%, transparent);
+  --bg-selected: color-mix(in oklab, var(--blue-500) 16%, transparent);
+  --bg-inverse: var(--slate-50);
+  --bg-overlay: rgb(0 0 0 / 0.6);
+
+  --fg-default: var(--slate-50);
+  --fg-muted: var(--slate-300);
+  --fg-subtle: var(--slate-400);
+  --fg-disabled: var(--slate-600);
+  --fg-inverse: var(--slate-900);
+
+  --border-default: var(--slate-800);
+  --border-strong: var(--slate-700);
+  --border-subtle: var(--slate-850);
+
+  --accent: var(--blue-500);
+  --accent-hover: var(--blue-400);
+  --accent-active: var(--blue-300);
+  --accent-subtle: color-mix(in oklab, var(--blue-500) 16%, transparent);
+  --accent-fg: var(--blue-300);
+  --focus-ring: color-mix(in oklab, var(--blue-400) 55%, transparent);
+
+  --danger: var(--rose-600);
+  --danger-hover: #e2405a;
+  --danger-subtle: color-mix(in oklab, var(--rose-600) 16%, transparent);
+  --danger-fg: var(--rose-300);
+  --warning-subtle: color-mix(in oklab, var(--amber-600) 18%, transparent);
+  --warning-fg: var(--amber-300);
+  --success-subtle: color-mix(in oklab, var(--emerald-600) 18%, transparent);
+  --success-fg: var(--emerald-300);
+
+  --status-empty-bg: color-mix(in oklab, var(--slate-500) 20%, transparent);
+  --status-empty-fg: var(--slate-300);
+  --status-empty-dot: var(--slate-400);
+  --status-filled-bg: color-mix(in oklab, var(--sky-600) 20%, transparent);
+  --status-filled-fg: var(--sky-300);
+  --status-filled-dot: var(--sky-300);
+  --status-delivered-bg: color-mix(in oklab, var(--emerald-600) 20%, transparent);
+  --status-delivered-fg: var(--emerald-300);
+  --status-delivered-dot: var(--emerald-300);
+  --status-maintenance-bg: color-mix(in oklab, var(--amber-600) 20%, transparent);
+  --status-maintenance-fg: var(--amber-300);
+  --status-maintenance-dot: var(--amber-300);
+  --status-retired-bg: color-mix(in oklab, var(--rose-600) 20%, transparent);
+  --status-retired-fg: var(--rose-300);
+  --status-retired-dot: var(--rose-300);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 8px 20px -6px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  --skeleton-base: var(--slate-800);
+  --skeleton-shine: var(--slate-850);
+
+  --chart-series: var(--blue-400);
+  --chart-series-muted: var(--slate-500);
+  --chart-warning: var(--amber-300);
+  --chart-track: var(--slate-800);
+  --chart-grid: var(--slate-800);
+  --chart-seq-min: color-mix(in oklab, var(--blue-500) 10%, var(--slate-900));
+  --chart-seq-max: var(--blue-500);
+}
