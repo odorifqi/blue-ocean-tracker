@@ -1,5 +1,6 @@
 export * from './Badge'
 export * from './Button'
+export * from './Charts'
 export * from './Dialog'
 export * from './Field'
 export * from './Menu'
