@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { BarChart3, Boxes, Workflow } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BrandMark } from './Brand'
+import { ReviewerKit } from './ReviewerKit'
 import { ThemeSwitch } from './ThemeSwitch'
 
 export function Layout({ mock }: { mock: boolean }) {
@@ -38,6 +39,7 @@ export function Layout({ mock }: { mock: boolean }) {
       <main id="main" className="main">
         <Outlet />
       </main>
+      <ReviewerKit mock={mock} />
     </div>
   )
 }
