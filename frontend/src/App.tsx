@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Layout } from './app/Layout'
 import { ToastProvider } from './ds'
+import { CylinderDetailPage } from './features/cylinders/CylinderDetailPage'
 import { CylindersPage } from './features/cylinders/CylindersPage'
 import { ServerErrorProvider } from './features/cylinders/ServerError'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -25,6 +26,7 @@ export function App({ mock }: { mock: boolean }) {
         element: <Layout mock={mock} />,
         children: [
           { path: '/', element: <CylindersPage /> },
+          { path: '/cylinders/:id', element: <CylinderDetailPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
