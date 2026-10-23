@@ -257,3 +257,31 @@
 .server-error__list li { display: flex; flex-direction: column; padding: var(--space-2) var(--space-3); border-left: 3px solid var(--warning-fg); background: var(--warning-subtle); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
 .server-error__list strong { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--warning-fg); }
 .server-error__code { font: 500 var(--text-xs) var(--font-mono); color: var(--fg-subtle); }
+
+/* ===== Lifecycle diagram ===== */
+.lifecycle { width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); }
+.lifecycle__edge { fill: none; stroke: var(--border-strong); stroke-width: 1.25; transition: stroke var(--duration-base); }
+.lifecycle__edge.is-on { stroke: var(--accent); stroke-width: 2; }
+.lifecycle__arrow { fill: var(--border-strong); }
+.lifecycle__arrow.is-on { fill: var(--accent); }
+.lifecycle__node rect { fill: var(--bg-surface); stroke: var(--border-strong); stroke-width: 1; transition: all var(--duration-base); }
+.lifecycle__node text { font-size: 15px; font-weight: 520; fill: var(--fg-muted); }
+.lifecycle__dot { fill: var(--s-dot); }
+.lifecycle__node { --s-dot: var(--status-empty-dot); --s-bg: var(--status-empty-bg); --s-fg: var(--status-empty-fg); transition: opacity var(--duration-base); }
+.lifecycle__node.status--filled { --s-dot: var(--status-filled-dot); --s-bg: var(--status-filled-bg); --s-fg: var(--status-filled-fg); }
+.lifecycle__node.status--delivered { --s-dot: var(--status-delivered-dot); --s-bg: var(--status-delivered-bg); --s-fg: var(--status-delivered-fg); }
+.lifecycle__node.status--maintenance { --s-dot: var(--status-maintenance-dot); --s-bg: var(--status-maintenance-bg); --s-fg: var(--status-maintenance-fg); }
+.lifecycle__node.status--retired { --s-dot: var(--status-retired-dot); --s-bg: var(--status-retired-bg); --s-fg: var(--status-retired-fg); }
+.lifecycle__node.is-current rect { fill: var(--s-bg); stroke: var(--s-dot); stroke-width: 2.5; }
+.lifecycle__node.is-current text { fill: var(--s-fg); font-weight: 700; }
+.lifecycle__node.is-next rect { fill: var(--accent-subtle); stroke: var(--accent); stroke-width: 1.5; }
+.lifecycle__node.is-next text { fill: var(--fg-default); font-weight: 600; }
+.lifecycle__node.is-interactive { cursor: pointer; outline: none; }
+.lifecycle__node.is-interactive:hover rect, .lifecycle__node.is-interactive:focus-visible rect { fill: var(--bg-surface); stroke-width: 2.5; }
+.lifecycle-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; list-style: none; font-size: var(--text-xs); color: var(--fg-muted); }
+.lifecycle-legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+.lifecycle-legend i { display: inline-block; width: 22px; }
+.lifecycle-legend__current { height: 12px; border-radius: var(--radius-full); background: var(--s-bg, var(--status-empty-bg)); border: 2px solid var(--s-dot, var(--status-empty-dot)); }
+.lifecycle-legend__next { height: 12px; border-radius: var(--radius-full); background: var(--accent-subtle); border: 1.5px solid var(--accent); }
+.lifecycle-legend__move { height: 2px; background: var(--accent); }
+.lifecycle-legend__other { height: 1.5px; background: var(--border-strong); }
