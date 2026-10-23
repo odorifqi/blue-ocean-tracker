@@ -115,6 +115,55 @@
 .pill__count { font-size: var(--text-xs); padding: 1px 6px; border-radius: var(--radius-full); background: var(--bg-muted); color: var(--fg-muted); min-width: 22px; text-align: center; }
 .pill.is-active .pill__count { background: color-mix(in oklab, var(--fg-inverse) 18%, transparent); color: inherit; }
 
+/* ===== Dialog ===== */
+.dialog {
+  padding: 0; border: 0; background: transparent; color: inherit; max-width: calc(100vw - 32px); width: 100%;
+  overflow: visible;
+}
+.dialog--sm { width: 420px; }
+.dialog--md { width: 520px; }
+.dialog::backdrop { background: var(--bg-overlay); backdrop-filter: blur(2px); animation: fade var(--duration-base) var(--ease-out); }
+.dialog[open] .dialog__panel { animation: pop var(--duration-slow) var(--ease-out); }
+.dialog__panel {
+  background: var(--bg-surface-raised); border: 1px solid var(--border-default); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg); overflow: hidden; max-height: calc(100dvh - 48px); display: flex; flex-direction: column;
+}
+.dialog__header { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-5) var(--space-5) 0; }
+.dialog__icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-lg); background: var(--accent-subtle); color: var(--accent-fg); }
+.dialog--danger .dialog__icon { background: var(--danger-subtle); color: var(--danger-fg); }
+.dialog--warning .dialog__icon { background: var(--warning-subtle); color: var(--warning-fg); }
+.dialog__titles { flex: 1; min-width: 0; padding-top: 2px; }
+.dialog__title { font-size: var(--text-lg); }
+.dialog__desc { margin-top: var(--space-1); color: var(--fg-muted); font-size: var(--text-sm); }
+.dialog__close { margin: -4px -6px 0 0; }
+.dialog__body { padding: var(--space-5); overflow: auto; display: flex; flex-direction: column; gap: var(--space-4); }
+.dialog__footer { display: flex; justify-content: flex-end; gap: var(--space-2); padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border-subtle); background: var(--bg-subtle); }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
+
+/* ===== Toast ===== */
+.toaster { position: fixed; z-index: var(--z-toast); right: var(--space-4); bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); width: min(380px, calc(100vw - 32px)); }
+/* Solid, high-contrast toasts: the colour says what happened, text and icon stay white.
+   Every background clears 4.5:1 against white, in both themes. */
+.toast {
+  display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  background: var(--toast-bg, var(--toast-info-bg)); color: var(--toast-fg); border: 1px solid color-mix(in oklab, #000 14%, var(--toast-bg, var(--toast-info-bg)));
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  animation: slide-in var(--duration-slow) var(--ease-out);
+}
+.toast--success { --toast-bg: var(--toast-success-bg); }
+.toast--error { --toast-bg: var(--toast-error-bg); }
+.toast--warning { --toast-bg: var(--toast-warning-bg); }
+.toast--info { --toast-bg: var(--toast-info-bg); }
+.toast__icon { flex: none; margin-top: 0; color: currentColor; }
+.toast__text { flex: 1; min-width: 0; }
+.toast__title { font-weight: var(--weight-semibold); color: inherit; }
+.toast__desc { color: inherit; opacity: 0.92; font-size: var(--text-sm); overflow-wrap: anywhere; }
+.toast__close { flex: none; border: 0; background: none; color: inherit; opacity: 0.85; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); }
+.toast__close:hover { opacity: 1; background: rgb(255 255 255 / 0.18); }
+.toast__close:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+@keyframes slide-in { from { opacity: 0; transform: translateY(12px); } }
+
 /* ===== Select (custom listbox) ===== */
 .select { padding: 0; cursor: pointer; }
 .select.is-disabled { cursor: not-allowed; }
