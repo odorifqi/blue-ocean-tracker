@@ -156,6 +156,43 @@
   .table__actions-inner .btn { width: var(--btn-h); padding: 0; }
   .table__actions-inner .btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+/* The ⋯ menu and the phone-only pieces of the card exist only in the phone layout. */
+.table__menu, .table__card-only { display: none; }
+.table__with { display: block; min-width: 0; }
+.serial { color: var(--fg-default); font-weight: var(--weight-medium); white-space: nowrap; }
+.muted { color: var(--fg-subtle); }
+.nowrap { white-space: nowrap; }
+.break { overflow-wrap: anywhere; }
+.hl { background: color-mix(in oklab, var(--amber-300) 45%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+@media (max-width: 760px) {
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table td { display: block; }
+  .table td { height: auto; padding: 0; border: 0; }
+  .table__grow { max-width: none; width: auto; }
+  /* Phone card: three left-aligned lines read top to bottom (serial / status and gas / customer and time),
+     with every action behind the ⋯ button beside the serial. The customer shares the last line and is cut
+     with an ellipsis, so every card is the same height whatever the data. */
+  .table__row {
+    display: grid !important; grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: 'serial serial serial menu' 'status gas . menu' 'sub sub sub sub';
+    gap: 6px var(--space-3); align-items: center; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-subtle);
+  }
+  .table__row:hover { background: none; }
+  .cyl-table td[data-label='Serial number'] { grid-area: serial; min-width: 0; }
+  .cyl-table td[data-label='Status'] { grid-area: status; }
+  .cyl-table td[data-label='Gas'] { grid-area: gas; }
+  .cyl-table td[data-label='Updated'], .cyl-table .table__actions { display: none !important; }
+  .cyl-table td[data-label='Customer'] { grid-area: sub; display: flex; gap: 6px; min-width: 0; white-space: nowrap; font-size: var(--text-sm); color: var(--fg-subtle); }
+  .cyl-table td[data-label='Customer'] > .muted { display: none; }
+  .table__card-only { display: inline; }
+  .table__with { display: flex; gap: 0.3em; min-width: 0; }
+  .table__with .customer { color: var(--fg-muted); font-weight: var(--weight-medium); }
+  .table__card-time { flex: none; }
+  .cyl-table td.table__menu { display: block; grid-area: menu; align-self: start; justify-self: end; }
+  .table__menu .menu-trigger { --btn-h: 36px; }
+}
+
 /* ===== Gas ===== */
 .gas { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
 .gas__swatch { width: 8px; height: 16px; border-radius: 2px; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fg-default) 24%, transparent); flex: none; }
