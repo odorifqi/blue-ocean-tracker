@@ -77,6 +77,44 @@
   background: var(--bg-subtle); border: 1px solid var(--border-default); border-bottom-width: 2px; border-radius: var(--radius-xs);
 }
 
+/* ===== Badges ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--space-1); height: 22px; padding: 0 var(--space-2);
+  border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: var(--weight-medium); white-space: nowrap;
+  background: var(--bg-muted); color: var(--fg-muted);
+}
+.badge--accent { background: var(--accent-subtle); color: var(--accent-fg); }
+.badge--success { background: var(--success-subtle); color: var(--success-fg); }
+.badge--warning { background: var(--warning-subtle); color: var(--warning-fg); }
+.badge--danger { background: var(--danger-subtle); color: var(--danger-fg); }
+
+.status {
+  --s-bg: var(--status-empty-bg); --s-fg: var(--status-empty-fg); --s-dot: var(--status-empty-dot);
+  display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 8px;
+  border-radius: var(--radius-full); background: var(--s-bg); color: var(--s-fg);
+  font-size: var(--text-xs); font-weight: var(--weight-semibold); white-space: nowrap;
+}
+.status--sm { height: 20px; padding: 0 8px 0 6px; font-size: 11px; }
+.status__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--s-dot); box-shadow: 0 0 0 3px color-mix(in oklab, var(--s-dot) 18%, transparent); }
+.status--empty { --s-bg: var(--status-empty-bg); --s-fg: var(--status-empty-fg); --s-dot: var(--status-empty-dot); }
+.status--filled { --s-bg: var(--status-filled-bg); --s-fg: var(--status-filled-fg); --s-dot: var(--status-filled-dot); }
+.status--delivered { --s-bg: var(--status-delivered-bg); --s-fg: var(--status-delivered-fg); --s-dot: var(--status-delivered-dot); }
+.status--maintenance { --s-bg: var(--status-maintenance-bg); --s-fg: var(--status-maintenance-fg); --s-dot: var(--status-maintenance-dot); }
+.status--retired { --s-bg: var(--status-retired-bg); --s-fg: var(--status-retired-fg); --s-dot: var(--status-retired-dot); }
+
+/* ===== Pills (filters) ===== */
+.pills { display: flex; gap: var(--space-2); flex-wrap: wrap; } /* 8px: each pill reads as its own button */
+.pill {
+  display: inline-flex; align-items: center; gap: var(--space-2); height: var(--control-h-sm); padding: 0 var(--space-3);
+  border: 1px solid var(--border-default); border-radius: var(--radius-full);
+  background: var(--bg-surface); color: var(--fg-muted); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.pill:hover { color: var(--fg-default); border-color: var(--border-strong); }
+.pill.is-active { background: var(--bg-inverse); color: var(--fg-inverse); border-color: var(--bg-inverse); }
+.pill__count { font-size: var(--text-xs); padding: 1px 6px; border-radius: var(--radius-full); background: var(--bg-muted); color: var(--fg-muted); min-width: 22px; text-align: center; }
+.pill.is-active .pill__count { background: color-mix(in oklab, var(--fg-inverse) 18%, transparent); color: inherit; }
+
 /* ===== Select (custom listbox) ===== */
 .select { padding: 0; cursor: pointer; }
 .select.is-disabled { cursor: not-allowed; }
