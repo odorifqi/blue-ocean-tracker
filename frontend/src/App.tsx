@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Layout } from './app/Layout'
 import { ToastProvider } from './ds'
 import { CylindersPage } from './features/cylinders/CylindersPage'
+import { ServerErrorProvider } from './features/cylinders/ServerError'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ApiError } from './lib/api'
 
@@ -34,7 +35,9 @@ export function App({ mock }: { mock: boolean }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
-        <RouterProvider router={router} future={{ v7_startTransition: true }} />
+        <ServerErrorProvider>
+          <RouterProvider router={router} future={{ v7_startTransition: true }} />
+        </ServerErrorProvider>
       </ToastProvider>
     </QueryClientProvider>
   )
