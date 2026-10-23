@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { DocsLayout } from './app/DocsLayout'
 import { AnalyticsPage } from './features/analytics/AnalyticsPage'
 import { Layout } from './app/Layout'
 import { ToastProvider } from './ds'
@@ -8,6 +9,7 @@ import { CylindersPage } from './features/cylinders/CylindersPage'
 import { ServerErrorProvider } from './features/cylinders/ServerError'
 import { StatusRulesPage } from './features/rules/StatusRulesPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { StyleGuidePage } from './pages/StyleGuidePage'
 import { ApiError } from './lib/api'
 
 const queryClient = new QueryClient({
@@ -33,6 +35,10 @@ export function App({ mock }: { mock: boolean }) {
           { path: '/status-rules', element: <StatusRulesPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
+      },
+      {
+        element: <DocsLayout />,
+        children: [{ path: '/design-system', element: <StyleGuidePage /> }],
       },
     ],
     { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/', future: { v7_relativeSplatPath: true } },
