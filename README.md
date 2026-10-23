@@ -10,7 +10,7 @@ A web app that tracks gas cylinders through their lifecycle: filling, delivery, 
 | `backend/` | ASP.NET Core 8 Web API with EF Core and SQLite, seeded from `cylinders.json`, plus xUnit integration tests. The frontend can also run without it (see below). |
 
 
-Example of screens are in [`docs/screenshots`](docs/screenshots). Test results are in [`docs/test-results`](docs/test-results): `backend-tests.png` (25 xUnit tests) and `frontend-tests.png` (25 Vitest tests).
+Example of screens are in [`docs/screenshots`](docs/screenshots). Test results are in [`docs/test-results`](docs/test-results): `backend-tests.png` (28 xUnit tests) and `frontend-tests.png` (42 Vitest tests).
 
 ## 1. Setup and running
 
@@ -40,7 +40,7 @@ Requirements: .NET 8 SDK.
 
 ```bash
 cd backend
-dotnet test                                   # 25 integration tests (xUnit + WebApplicationFactory)
+dotnet test                                   # 28 integration tests (xUnit + WebApplicationFactory)
 cd Cylinders.Api
 dotnet run --urls http://localhost:5080       # creates cylinders.db and seeds the 87 records on first run
 ```
@@ -61,6 +61,12 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 **Design library in code, not a separate file.** Tokens are CSS custom properties in three tiers: primitives, semantic roles, and component use (`src/styles/tokens.css`). The components in `src/ds/` use only semantic tokens. That's how dark mode works: it swaps one layer. The `/design-system` page renders the real components, so the docs can't drift from the product.
 
 **Status first.** Each of the five statuses has one colour, one dot and one label everywhere: badges, filters, the overview bar and the lifecycle diagram.
+
+**Tables keep fixed column widths.** Each table sets its columns as percentages that add up to 100% (list: serial 15, gas 15, status 15, customer 15, updated 10, actions 30), with a fixed table layout. Columns stay in the same place on every page, while loading and whatever the data contains. Long values truncate or wrap inside their cell. All three action labels show whenever they fit (from a ~1440px window). When they don't, all three drop to icons together, so a row never mixes words and icons. Detail keeps its blue tint, so it stays the main action, and every icon keeps its name in a tooltip and for screen readers. A date wider than the 10% Updated column runs into the empty left side of the Actions column rather than being cut off. On small laptops and tablets the table keeps a minimum width and scrolls sideways, so a serial or a status badge is never squeezed.
+
+**Phones get a card, not a squeezed table.** At 760px and below each cylinder is a three-line card, read top to bottom: the serial, then status and gas, then "With <customer> · Updated <time>". The customer is cut with "…" so every card has the same height, even with the 102-character name in the data file. All three actions (Detail first, then Edit details and Change status) sit behind one ⋯ button next to the serial, in a menu with 44px rows. On a Retired cylinder, Change status is greyed out and says "Retired is final".
+
+**Only Detail opens a cylinder.** List rows aren't clickable, so a stray click while reading, or while selecting a serial to copy, never navigates away. Detail is the one way in.
 
 **Gas colours follow ISO 32.** Gas swatches use the standard cylinder shoulder colours (for example, white for oxygen and maroon for acetylene). The screen matches the paint on the physical cylinder.
 
@@ -94,6 +100,16 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - Charts are plain HTML/CSS components in the design library (`src/ds/Charts.tsx`), with no chart library. One series uses one colour, status colours appear only where the data is a status, and every value is printed next to its mark, so colour and hover are never the only way to read a number.
 - The numbers come from one endpoint, `GET /api/cylinders/analytics`, implemented in both the .NET API and the mock (`src/lib/analytics.ts`). The bucket rules are the same in both.
 
+**Cylinder history.** The detail page ends with a History card listing every change to that cylinder, newest first: when it was added, each status change (with the customer under the move: "To" on a delivery, "Back from" on a return), and each edit with the old and new value.
+- Four fixed columns (Action At 15%, Event 15%, Change 50%, Action By 20%); times show as DD-MM-YYYY, HH:MM in 24-hour time and four fixed summary slots (tracked since, deliveries, customers, last edit). A dash fills anything that doesn't apply, so the card has the same shape for every cylinder.
+- Filter by status changes or edits, 10 entries per page. Filter and page live in the URL (`?history=&historyPage=`), like the list.
+- **Who made the change (`actionBy`)** is set by the server, never taken from the request, and saved with the entry. There is no sign-in yet, so every change is recorded as a fixed demo account ("Rina Wulandari", configurable with `DemoUser`). With real sign-in, the same field would come from the signed-in user.
+- **Append-only.** Each entry is written in the same database save as the change itself, so a cylinder can't change without its entry. There is no endpoint to edit or delete history, and SQLite triggers reject `UPDATE` and `DELETE` on the history table even from direct database access. Saving an edit with no real change writes nothing.
+- The 87 imported cylinders have no past, so each gets exactly one "Imported" entry at the file's own timestamp (recorded by "System import"). Nothing earlier is invented, and the card says so.
+- API: `GET /api/cylinders/{id}/history?type=all|status|edit&page=&pageSize=` returns `{ items, page, pageSize, totalCount, summary }`, in both the .NET API and the mock.
+
+**Status rules page (`/status-rules`).** A read-only view of the lifecycle as one table: each status with its meaning (including where new cylinders start and which status asks for the customer), the statuses it can move to, and how many cylinders are in it. Only allowed moves are listed; Retired says "None. Retired is final." An earlier from/to grid was dropped because its three cell types took more effort to read than the five short lists it encoded. The page is drawn from `GET /api/meta`, so it shows the rules the server enforces rather than a copy in the frontend.
+
 **Demo controls (mock mode only).** A small panel can add network delay, fail the next request, fail every request, or simulate going offline. It also resets the data to the JSON seed. Reviewers can use it to see every UI state.
 
 **Backend.**
@@ -123,12 +139,15 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **Editing** serial number and gas type is allowed in any status, including Retired, because the brief only restricts status changes. Editing with no changes is blocked in the UI.
 - **Customer name** is trimmed and must be 1–120 characters when delivering. It's cleared when a cylinder goes back to Empty.
 - **Extra endpoints:** `GET /api/cylinders/summary` returns counts per status for the overview, and `GET /api/cylinders/analytics` returns the aggregates for the Analytics page. Both are additions, not changes to the recommended routes.
-- **Analytics without history:** the data has no status history, only `lastUpdated`, so "time since last movement" uses that field. Trends over time would need a status-change log (see "With more time").
+- **Analytics and history:** the data file has no status history, only `lastUpdated`, so "time since last movement" uses that field. History is recorded from import onward, so trends over time become possible as it fills up.
+- **Statuses are fixed:** the brief defines exactly five statuses and calls every other move invalid, so the Status rules page shows the rules but doesn't edit them.
+- **Existing local databases** made before history existed only hold seed data, so the API rebuilds and reseeds them on start.
 - **Times** are stored and sent as UTC. They're displayed in the user's local time zone (WIB for the ops team), and the UTC value is shown as a tooltip on the detail page's last-updated time.
 
 ## 4. With more time
 
-- Movement history per cylinder (an audit log of every status change, with who made it and when), shown as a timeline.
+- Editable status rules: add statuses and choose their moves in the Status rules grid. The brief's five statuses stay as protected defaults with a "Restore brief rules" action, and statuses carry behaviours (start, asks for customer, final) so the rules don't depend on names. Warnings catch dead ends and unreachable statuses, and a review step shows how many cylinders a change affects.
+- Real sign-in, so `actionBy` in the history is the signed-in user instead of a demo account.
 - Sortable columns, plus an "idle" filter on the server instead of only a badge.
 - Bulk actions, such as marking a whole delivery run as returned, and scanning a cylinder's barcode or QR code from a phone camera.
 - Customer records as their own entity, so the same company isn't typed several different ways.
