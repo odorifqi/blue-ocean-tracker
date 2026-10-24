@@ -24,6 +24,13 @@ describe('Cylinder detail page', () => {
     expect(screen.getAllByRole('button', { name: 'Edit details' })).toHaveLength(1)
   })
 
+  it('names the browser tab after the serial number', async () => {
+    const any = db.all()[0]
+    renderWithApp(<CylinderDetailPage />, { route: `/cylinders/${any.id}`, path: '/cylinders/:id' })
+    await screen.findByRole('region', { name: 'Details' })
+    expect(document.title).toBe(`${any.serialNumber} · Blue Ocean Tracker`)
+  })
+
   it('keeps Retire in place but disabled when it is not allowed, and the diagram nodes open the dialog', async () => {
     const user = userEvent.setup()
     const delivered = db.all().find((c) => c.status === 'Delivered')!

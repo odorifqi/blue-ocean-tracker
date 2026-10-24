@@ -6,6 +6,7 @@ import type { Meta, StatusRule } from '../../lib/api'
 import { STATUS_DESCRIPTION, STATUS_LABEL } from '../../lib/domain'
 import { useMeta, useSummary } from '../../lib/queries'
 import { SlowNotice } from '../cylinders/SlowNotice'
+import { useDocumentTitle } from '../../lib/hooks'
 
 /**
  * Read-only view of the lifecycle rules, rendered from /api/meta rather than the client's
@@ -13,6 +14,7 @@ import { SlowNotice } from '../cylinders/SlowNotice'
  * "what is it" and "where can it go"; only allowed moves are listed, so there is nothing to decode.
  */
 export function StatusRulesPage() {
+  useDocumentTitle('Status rules')
   const meta = useMeta()
   const summary = useSummary()
   const data = meta.data

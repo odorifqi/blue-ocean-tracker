@@ -2,6 +2,13 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 
 export const APP_NAME = 'Blue Ocean Tracker'
 
+/** Names the browser tab after the page, e.g. "CYL-012345 · Blue Ocean Tracker", so several open tabs stay apart. */
+export function useDocumentTitle(page?: string) {
+  useEffect(() => {
+    document.title = page ? `${page} · ${APP_NAME}` : APP_NAME
+  }, [page])
+}
+
 export function useDebounced<T>(value: T, ms = 300) {
   const [v, setV] = useState(value)
   useEffect(() => {

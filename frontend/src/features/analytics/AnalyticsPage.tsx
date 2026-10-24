@@ -25,11 +25,13 @@ import { statusKey } from '../../ds/Badge'
 import { GasSwatch } from '../cylinders/bits'
 import { SlowNotice } from '../cylinders/SlowNotice'
 import { useReveal } from '../../lib/useReveal'
+import { useDocumentTitle } from '../../lib/hooks'
 
 const timeFmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' })
 const listLink = (params: Record<string, string>) => `/?${new URLSearchParams(params)}`
 
 export function AnalyticsPage() {
+  useDocumentTitle('Analytics')
   const query = useAnalytics()
   const a = query.data
 

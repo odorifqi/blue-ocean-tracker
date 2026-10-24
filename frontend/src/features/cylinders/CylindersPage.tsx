@@ -19,7 +19,7 @@ import {
 import type { Cylinder } from '../../lib/api'
 import { STATUSES, STATUS_LABEL, isStatus, type CylinderStatus } from '../../lib/domain'
 import { absoluteTime, relativeTime } from '../../lib/format'
-import { useDebounced } from '../../lib/hooks'
+import { useDebounced, useDocumentTitle } from '../../lib/hooks'
 import { useCylinders, useSummary } from '../../lib/queries'
 import { GasSwatch, Highlight, IdleBadge } from './bits'
 import { CylinderFormDialog } from './CylinderFormDialog'
@@ -51,6 +51,7 @@ function useListParams() {
 
 export function CylindersPage() {
   const { status, page, pageSize, search, set } = useListParams()
+  useDocumentTitle('Cylinders')
   const [searchDraft, setSearchDraft] = useState(search)
   const debounced = useDebounced(searchDraft.trim(), 300)
 

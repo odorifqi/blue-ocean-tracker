@@ -1,8 +1,10 @@
 import { Compass } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button, EmptyState } from '../ds'
+import { useDocumentTitle } from '../lib/hooks'
 
 export function NotFoundPage() {
+  useDocumentTitle('Page not found')
   return (
     <div className="page">
       <div className="card">

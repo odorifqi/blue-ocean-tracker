@@ -13,10 +13,12 @@ import { CylinderFormDialog } from './CylinderFormDialog'
 import { LifecycleDiagram, LifecycleLegend } from './LifecycleDiagram'
 import { SlowNotice } from './SlowNotice'
 import { StatusChangeDialog } from './StatusChangeDialog'
+import { useDocumentTitle } from '../../lib/hooks'
 
 export function CylinderDetailPage() {
   const id = Number(useParams().id)
   const query = useCylinder(id)
+  useDocumentTitle(query.data?.serialNumber ?? 'Cylinder')
   const [editing, setEditing] = useState(false)
   const [statusTarget, setStatusTarget] = useState<CylinderStatus | undefined>()
   const toast = useToast()

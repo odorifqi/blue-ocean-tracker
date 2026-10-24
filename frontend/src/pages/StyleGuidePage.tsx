@@ -32,6 +32,7 @@ import { GAS_META } from '../lib/gas'
 import { GasSwatch, Highlight } from '../features/cylinders/bits'
 import { LifecycleDiagram } from '../features/cylinders/LifecycleDiagram'
 import { useServerError } from '../features/cylinders/ServerError'
+import { useDocumentTitle } from '../lib/hooks'
 
 const SECTIONS = [
   ['principles', 'Principles'],
@@ -145,6 +146,7 @@ const gasOptions = GAS_TYPES.map((g) => ({ value: g, label: g, icon: <GasSwatch 
 const RAMP = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900']
 
 export function StyleGuidePage() {
+  useDocumentTitle('Design system')
   const toast = useToast()
   const showServerError = useServerError()
   const [dialog, setDialog] = useState(false)
