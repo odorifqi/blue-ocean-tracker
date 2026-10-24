@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { DocsLayout } from './app/DocsLayout'
 import { AnalyticsPage } from './features/analytics/AnalyticsPage'
@@ -9,6 +10,7 @@ import { CylindersPage } from './features/cylinders/CylindersPage'
 import { ServerErrorProvider } from './features/cylinders/ServerError'
 import { StatusRulesPage } from './features/rules/StatusRulesPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { RouteError } from './pages/RouteError'
 import { StyleGuidePage } from './pages/StyleGuidePage'
 import { ApiError } from './lib/api'
 
@@ -24,25 +26,32 @@ const queryClient = new QueryClient({
 })
 
 export function App({ mock }: { mock: boolean }) {
-  const router = createBrowserRouter(
+  // Created once: a router rebuilt on a re-render would remount the whole tree.
+  const [router] = useState(() => createBrowserRouter(
     [
       {
         element: <Layout mock={mock} />,
+        // The error page sits inside the layout, so a page that throws keeps the sidebar working.
         children: [
-          { path: '/', element: <CylindersPage /> },
-          { path: '/cylinders/:id', element: <CylinderDetailPage /> },
-          { path: '/analytics', element: <AnalyticsPage /> },
-          { path: '/status-rules', element: <StatusRulesPage /> },
-          { path: '*', element: <NotFoundPage /> },
+          {
+            errorElement: <RouteError />,
+            children: [
+              { path: '/', element: <CylindersPage /> },
+              { path: '/cylinders/:id', element: <CylinderDetailPage /> },
+              { path: '/analytics', element: <AnalyticsPage /> },
+              { path: '/status-rules', element: <StatusRulesPage /> },
+              { path: '*', element: <NotFoundPage /> },
+            ],
+          },
         ],
       },
       {
         element: <DocsLayout />,
-        children: [{ path: '/design-system', element: <StyleGuidePage /> }],
+        children: [{ errorElement: <RouteError />, children: [{ path: '/design-system', element: <StyleGuidePage /> }] }],
       },
     ],
     { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/', future: { v7_relativeSplatPath: true } },
-  )
+  ))
 
   return (
     <QueryClientProvider client={queryClient}>
