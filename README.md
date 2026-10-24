@@ -43,7 +43,7 @@ Requirements: .NET 8 SDK.
 
 ```bash
 cd backend
-dotnet test                                   # 28 integration tests (xUnit + WebApplicationFactory)
+dotnet test                                   # 29 integration tests (xUnit + WebApplicationFactory)
 cd Cylinders.Api
 dotnet run --urls http://localhost:5080       # creates cylinders.db and seeds the 87 records on first run
 ```

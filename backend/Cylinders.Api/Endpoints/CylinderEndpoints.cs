@@ -1,6 +1,7 @@
 using Cylinders.Api.Contracts;
 using Cylinders.Api.Data;
 using Cylinders.Api.Domain;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cylinders.Api.Endpoints;
@@ -163,7 +164,7 @@ public static class CylinderEndpoints
         cylinder.RefreshSearchKey();
         db.Cylinders.Add(cylinder);
         Record(db, cylinder, user, EventTypes.Added, to: CylinderStatus.Empty);
-        await db.SaveChangesAsync();
+        if (!await TrySave(db)) return DuplicateSerial(serial!);
         return Results.Created($"/api/cylinders/{cylinder.Id}", CylinderDto.From(cylinder));
     }
 
@@ -186,7 +187,7 @@ public static class CylinderEndpoints
             cylinder.LastUpdated = clock.GetUtcNow().UtcDateTime;
             cylinder.RefreshSearchKey();
             Record(db, cylinder, user, EventTypes.Edited, changes: changes);
-            await db.SaveChangesAsync();
+            if (!await TrySave(db)) return DuplicateSerial(serial!);
         }
         return Results.Ok(CylinderDto.From(cylinder));
     }
@@ -305,6 +306,21 @@ public static class CylinderEndpoints
         else if (gas is null) errors["gasType"] = [$"Gas type must be one of: {string.Join(", ", CylinderRules.GasTypes)}."];
 
         return (serial, gas, errors);
+    }
+
+    // The pre-check gives the friendly 409 in the normal case. Two requests racing for the same serial both pass it,
+    // so the unique index is the backstop: its violation becomes the same 409 instead of a 500.
+    private static async Task<bool> TrySave(AppDbContext db)
+    {
+        try
+        {
+            await db.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateException e) when (e.InnerException is SqliteException { SqliteErrorCode: 19 })
+        {
+            return false;
+        }
     }
 
     private static Task<bool> SerialTaken(AppDbContext db, string serial, int? exceptId) =>

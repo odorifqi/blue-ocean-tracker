@@ -26,6 +26,19 @@ public class CreateAndUpdateTests
         Assert.Contains("serialNumber", (await dup.Read<ProblemBody>()).Errors!.Keys);
     }
 
+    [Fact]
+    public async Task Concurrent_creates_with_one_serial_give_one_201_and_409s_never_a_500()
+    {
+        using var app = new TestApp();
+        var client = app.CreateClient();
+
+        var responses = await Task.WhenAll(Enumerable.Range(0, 8).Select(_ =>
+            client.PostAsJsonAsync("/api/cylinders", new { serialNumber = "CYL-888888", gasType = "Argon" })));
+
+        Assert.Single(responses, r => r.StatusCode == HttpStatusCode.Created);
+        Assert.All(responses.Where(r => r.StatusCode != HttpStatusCode.Created), r => Assert.Equal(HttpStatusCode.Conflict, r.StatusCode));
+    }
+
     [Theory]
     [InlineData("CYL-12345", "Oxygen", "serialNumber")]
     [InlineData("ABC-123456", "Oxygen", "serialNumber")]

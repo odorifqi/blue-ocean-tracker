@@ -21,9 +21,8 @@ All commands run from `frontend/`:
 - Lint: `npm run lint` (`oxlint`)
 - Build: `npm run build` (`tsc -b && vite build`)
 
-Backend: `cd backend && dotnet test` (28 integration tests), then `cd Cylinders.Api && dotnet run --urls http://localhost:5080`.
-Point the frontend at it with `VITE_API_URL=http://localhost:5080`. **`dotnet` is not installed on this
-machine** — the backend cannot currently be built or verified here.
+Backend: `cd backend && dotnet test` (29 integration tests), then `cd Cylinders.Api && dotnet run --urls http://localhost:5080`.
+Point the frontend at it with `VITE_API_URL=http://localhost:5080`. The backend needs the .NET 8 SDK.
 
 ## Architecture
 
