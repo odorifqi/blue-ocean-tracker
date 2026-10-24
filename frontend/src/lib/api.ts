@@ -168,20 +168,20 @@ async function request<T>(path: string, init?: RequestInit, isRetry = false): Pr
   } catch {
     throw new ApiError(0, { detail: 'Check your connection and try again.' })
   }
+  // Every mock response is JSON. Anything else came from the host (Vercel's index.html, or the
+  // Vite dev server's empty 404), so the mock has lost this tab. The request never reached the
+  // mock, so sending it again after reconnecting is safe, even for a POST.
+  if (reconnectMock && !isRetry && !res.headers.get('content-type')?.includes('json')) {
+    reconnecting ??= reconnectMock().finally(() => (reconnecting = undefined))
+    await reconnecting.catch(() => {})
+    return request<T>(path, init, true)
+  }
   const text = await res.text()
   const json = text ? parseJson(text) : undefined
   if (!res.ok) throw new ApiError(res.status, (json as object | undefined) ?? (text ? { detail: text } : {}))
   // A 2xx that isn't JSON is a host's fallback page (Vercel answers unknown paths with
   // index.html), not data. Treat it as a failed request instead of handing HTML to a page.
-  if (text && json === undefined) {
-    if (reconnectMock && !isRetry) {
-      // The request never reached the mock, so sending it again is safe, even for a POST.
-      reconnecting ??= reconnectMock().finally(() => (reconnecting = undefined))
-      await reconnecting.catch(() => {})
-      return request<T>(path, init, true)
-    }
-    throw unexpectedResponse(res.status)
-  }
+  if (text && json === undefined) throw unexpectedResponse(res.status)
   return json as T
 }
 
