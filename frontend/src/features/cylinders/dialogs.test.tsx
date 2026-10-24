@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { STATUS_ACTION } from '../../lib/domain'
 import { db } from '../../mocks/db'
 import { renderWithApp } from '../../test/render'
 import { CylinderFormDialog } from './CylinderFormDialog'
@@ -86,5 +87,18 @@ describe('Status change', () => {
     await new Promise((r) => setTimeout(r, 300))
     expect(db.history(filled.id).filter((e) => e.type === 'status')).toHaveLength(1)
     expect(screen.queryByText('Invalid status transition')).not.toBeInTheDocument()
+  })
+
+  it('locks the next-status choices while the change is saving', async () => {
+    const user = userEvent.setup()
+    const filled = db.all().find((c) => c.status === 'Filled')!
+    renderWithApp(<StatusChangeDialog open cylinder={filled} onClose={() => {}} />)
+
+    await user.click(screen.getByRole('radio', { name: /In maintenance/ }))
+    await user.click(screen.getByRole('button', { name: STATUS_ACTION.InMaintenance }))
+
+    for (const radio of screen.getAllByRole('radio')) expect(radio).toBeDisabled()
+    expect(screen.getByRole('radiogroup', { name: 'Choose the next status' })).toHaveAttribute('aria-disabled', 'true')
+    await waitFor(() => expect(db.find(filled.id)).toMatchObject({ status: 'InMaintenance' }))
   })
 })

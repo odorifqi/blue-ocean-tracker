@@ -24,6 +24,15 @@ describe('Cylinder detail page', () => {
     expect(screen.getAllByRole('button', { name: 'Edit details' })).toHaveLength(1)
   })
 
+  it('locks Edit details on a Retired cylinder and says why', async () => {
+    const retired = db.all().find((c) => c.status === 'Retired')!
+    renderWithApp(<CylinderDetailPage />, { route: `/cylinders/${retired.id}`, path: '/cylinders/:id' })
+    const details = await screen.findByRole('region', { name: 'Details' })
+    const edit = within(details).getByRole('button', { name: 'Edit details' })
+    expect(edit).toBeDisabled()
+    expect(edit).toHaveAttribute('title', 'Retired cylinders can’t be edited')
+  })
+
   it('names the browser tab after the serial number', async () => {
     const any = db.all()[0]
     renderWithApp(<CylinderDetailPage />, { route: `/cylinders/${any.id}`, path: '/cylinders/:id' })

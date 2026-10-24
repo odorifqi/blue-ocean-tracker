@@ -255,7 +255,7 @@ export function StyleGuidePage() {
             </div>
           </Section>
 
-          <Section id="type" title="Typography" intro="Inter Variable for UI, JetBrains Mono for serial numbers and codes. Body text is 14px, for dense operational screens.">
+          <Section id="type" title="Typography" intro="Inter Variable for UI, JetBrains Mono for serial numbers and codes. Body text is 14px, for dense operational screens. Every plain value in a table cell has one style: regular weight, default colour, one size per table. Grey is only for things that aren’t values: the “—” placeholder, field labels and the struck-out old value.">
             <div className="type-scale">
               {[
                 ['--text-3xl', '32 / 600', 'Page title'],
@@ -263,7 +263,7 @@ export function StyleGuidePage() {
                 ['--text-xl', '20 / 600', 'Stat value'],
                 ['--text-lg', '16 / 600', 'Card & dialog title'],
                 ['--text-md', '14 / 420', 'Body, table cells, inputs'],
-                ['--text-sm', '13 / 420', 'Secondary text, hints'],
+                ['--text-sm', '13 / 420', 'Secondary text, hints, History cells'],
                 ['--text-xs', '12 / 520', 'Labels, badges, captions'],
               ].map(([t, spec, use]) => (
                 <div key={t} className="type-row">
@@ -348,7 +348,7 @@ export function StyleGuidePage() {
                 label="Actions for CYL-118204"
                 items={[
                   { label: 'Detail', icon: <Info size={16} />, primary: true, onSelect: () => {} },
-                  { label: 'Edit details', icon: <PencilLine size={16} />, separated: true, onSelect: () => {} },
+                  { label: 'Edit details', icon: <PencilLine size={16} />, separated: true, onSelect: () => {}, disabled: true, hint: 'Retired is read-only' },
                   { label: 'Change status', icon: <Repeat2 size={16} />, onSelect: () => {}, disabled: true, hint: 'Retired is final' },
                 ]}
               />

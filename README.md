@@ -13,7 +13,7 @@ A web app that tracks gas cylinders through their lifecycle: filling, delivery, 
 | `backend/` | ASP.NET Core 8 Web API with EF Core and SQLite, seeded from `cylinders.json`, plus xUnit integration tests. The frontend can also run without it (see below). |
 
 
-Example of screens are in [`docs/screenshots`](docs/screenshots). Test results are in [`docs/test-results`](docs/test-results): `backend-tests.png` (29 xUnit tests) and `frontend-tests.png` (57 Vitest tests).
+Example of screens are in [`docs/screenshots`](docs/screenshots). Test results are in [`docs/test-results`](docs/test-results): `backend-tests.png` (30 xUnit tests) and `frontend-tests.png` (60 Vitest tests).
 
 ## 1. Setup and running
 
@@ -43,7 +43,7 @@ Requirements: .NET 8 SDK.
 
 ```bash
 cd backend
-dotnet test                                   # 29 integration tests (xUnit + WebApplicationFactory)
+dotnet test                                   # 30 integration tests (xUnit + WebApplicationFactory)
 cd Cylinders.Api
 dotnet run --urls http://localhost:5080       # creates cylinders.db and seeds the 87 records on first run
 ```
@@ -62,7 +62,7 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 ## 2. Changes from the requirement
 
 - **Ids 1–87 are assigned in file order.** The requirement says the JSON has ids, but `cylinders.json` has none.
-- **Serial number and gas type can be edited in any status, including Retired.** The requirement only restricts status changes, and a Retired cylinder can still have a typo in its serial. Saving with no changes is blocked in the UI.
+- **A Retired cylinder can't be edited.** The requirement only restricts status changes, but I lock serial number and gas type too once a cylinder is retired. Retired is final, so the record should stay as it was when the cylinder left service: its history, the Analytics counts and any paperwork that names that serial keep matching. The cost is that a typo found after retiring can't be fixed in the app; I chose integrity over that rare case. The API refuses the edit with 409 (see Engineering decisions). Saving with no changes is blocked in the UI.
 - **Stricter input checks.** An unknown status filter or a `pageSize` below 1 returns 400 instead of being ignored, so a bad link shows an error rather than a silently wrong list.
 - **Extra endpoints, all additions.** The recommended routes are unchanged. I added `GET /api/cylinders/summary` (counts per status), `GET /api/cylinders/analytics` (the Analytics page), `GET /api/cylinders/{id}/history` and `GET /api/meta` (the lifecycle rules). Each cylinder in a response also carries `allowedNextStatuses`.
 - **Cylinder history, including who made each change.** Not in the requirement. I added it because a lifecycle tracker that can't say what happened to a cylinder can't help with the requirement's lost-asset problem.
@@ -74,6 +74,7 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 
 - **The design library lives in code, as a living style guide.** Tokens are CSS custom properties in three tiers: primitives, semantic roles and component use (`src/styles/tokens.css`). Components in `src/ds/` use only semantic tokens, which is how dark mode works: it swaps one layer. The `/design-system` page renders the real components, so the docs can't drift from the product. It opens from the "Miscellaneous" panel in its own frame, apart from the ops screens.
 - **Rigid layouts, with a dash for empty values.** Every screen keeps the same regions in the same place whatever the data, so people learn once where to look.
+- **One text style for every plain value in a table.** Regular weight, the default text colour and one size per table: 14px in the list and Status rules, 13px in the denser History card. I keep grey for things that aren't values, like the "—" placeholder, small field labels and the struck-out old value. Before this, "Action at" and "Updated" were grey, which made a real date look like an empty cell, and the event name and serial were semibold for no extra meaning. I kept the serial number in monospace because that's how it looks everywhere else in the app and on the cylinder, but at the same size and weight as the rest of the row. Phone cards keep a heavier title (the serial, or the event in History), because there it heads the card.
 - **One colour, dot and label per status, everywhere.** Status is what people scan for, so it reads the same in badges, filters, charts and the lifecycle diagram.
 - **Gas colours follow ISO 32.** Swatches use the standard cylinder shoulder colours (for example, white for oxygen and maroon for acetylene), so the screen matches the paint on the physical cylinder. Gas pickers lead with the name and show the formula underneath, because people say "oxygen", not "O₂".
 - **A custom Select instead of the native dropdown.** The native menu can't show status dots or gas swatches, and it looks different on every OS.
@@ -91,7 +92,8 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **Filter pills only, with the "Out 30+ days" banner.** I moved the status count tiles to Analytics because they repeated the pills. The one alert that matters day to day stays on the list: a cylinder Delivered for 30 days or more gets an "Out Nd" badge, and the banner counts them (problem 5 in the requirement).
 - **Row actions: Edit details and Change status as equal ghost buttons, and Detail as a soft blue tint with an info icon.** Detail is the main way in, so it has the most contrast in the row. It's a tint, not solid blue, because ten solid buttons on a page would outrank "New cylinder".
 - **Rows aren't clickable.** A stray click while reading, or while selecting a serial to copy, never navigates away. Detail is the one way in.
-- **Action labels are all or nothing.** All three labels show whenever they fit (from about a 1440px window). When they don't, all three become icons together, so a row never mixes words and icons. Every icon keeps its name in a tooltip and for screen readers.
+- **Action labels are all or nothing.** All three labels show when the list is at least 1200px wide (about a 1530px window). Below that, all three become icons together, so a row never mixes words and icons, and the Actions column shrinks to fit the icons so the other columns get the room. Every icon keeps its name in a tooltip and for screen readers.
+- **The customer lives in the Status cell, not in its own column: [status] With <customer> [Out Nd].** A cylinder only has a customer while it's Delivered, so a Customer column was mostly dashes, the same reason History shows "To X" inside its Change cell. "Out Nd" sits right after the customer, the company ops will call. On wide screens it's one line, and the name shortens to fit. At 1280px and below, the customer line drops under the badge, so most names still show in full; those rows get taller and the rest stay 52px.
 - **The list fills the screen.** Search, filters, column names and pagination stay pinned and only the rows scroll, so paging and filtering stay in reach. The footer shows even at 0 results, so the layout doesn't jump.
 - **A page change lands on the top of the list.** On a phone the pager sits under the last card, so after Next I jump the view back up to the list's search box and filter pills, just under the top bar, with the first card right below them. Landing on the first card alone would hide which search and status the reader is paging through, so the controls that say "where am I" stay in view. Focus moves to the results so the next Tab starts at row one. It only happens when the list's top is off-screen, so a view the reader can already see never moves. The jump is instant rather than smooth, because the rows are replaced anyway and their fade-in shows the change. The new "Showing 21–30 of 87" range is announced to screen readers. The History card pages the same way, landing on its filter pills.
 - **Title Case column headers and an "Updated" column**, which tells ops how fresh a row is.
@@ -104,6 +106,7 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **Header: the serial with a copy button, then status · updated time.** The serial is what people look up and paste elsewhere. The browser tab shows the serial too, so several open cylinders stay apart.
 - **Details show one value per row:** Record ID, Serial number, Gas type, Chemical formula, Customer and Last updated (as an absolute time, with UTC in a tooltip). One value per row scans faster than values with small sub-labels. "Edit details" sits in the card's head, next to what it edits.
 - **The lifecycle diagram shows the whole state machine.** Edges are routed by hand so none cross, and a legend explains the marks. The current status is the only solid pill, filled with its status colour, like a "you are here" dot. The allowed next steps have a dashed accent outline ("not yet") and are clickable; on hover or focus they turn solid. I separated the two by fill and line style rather than colour because Filled's sky blue and the accent blue are too close to tell apart, and it also keeps the diagram readable without colour.
+- **Each lifecycle pill hugs its label.** The pills are as wide as their status name plus even padding, sized for the bold current state so a pill never changes width when the status moves. A long name like "In maintenance" gets room to breathe, a short one like "Empty" doesn't sit in empty space, and the different widths give each status a shape that can be recognised at a glance. The edges are tied to each pill's edges, so they stay attached and still don't cross.
 - **One "Move to" bar under the diagram.** The usual next move comes first as the primary button, and Retire is always last, so the risky action is never where the hand expects the usual one. The bar lists only the moves the lifecycle allows; Retire stays in place but is disabled when it isn't allowed yet ("Mark it returned empty first"), and a Retired cylinder shows "None. Retired is final."
 
 ### Change status dialog
@@ -111,12 +114,14 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **Two groups: a flat "Status change" preview row, then bordered "Choose the next status" cards.** Grouping separates what is being changed from what can be picked.
 - **Visible radio buttons, a status dot instead of the full badge, and a "Usual next step" tag with nothing pre-selected.** The tag guides without deciding for the user, and with no pre-selection, Enter can't apply a move nobody chose. Retired is set apart from the other choices.
 - **Only allowed moves are offered**, and Delivered asks for the customer.
+- **The choices lock while the change is saving.** After Submit, the next-status options are disabled until the server answers: the picked one stays at full strength and the others fade, so what is being saved can't be changed mid-request. If the save fails, they unlock again.
 - **Moves that lose something say so in one sentence.** Returning a cylinder to Empty names the customer it clears ("Returning clears the customer PT Maju Jaya Abadi from this cylinder."), so ops can check it's the right company before applying. Retiring shows a red warning that it's permanent.
 
 ### Create and edit
 
 - **A review step before saving.** It shows the changes (old → new) before anything is saved; this is the requirement's "validation window". It lists only serial number and gas type, because that's all the request sends.
 - **"No changes yet" in the footer** explains why Save is disabled, instead of leaving a dead button.
+- **Edit details is disabled on a Retired cylinder, and says why.** I kept the button in place rather than hiding it, the same way Change status already behaves, so the row and the Details card don't change shape and the reader learns the rule instead of wondering where the action went. The row button and the Details card button explain it on hover ("Retired cylinders can’t be edited"), and the phone ⋯ menu shows "Retired is read-only" under the item, next to "Retired is final" for Change status.
 - **The serial field has a fixed `CYL-` prefix**, accepts digits only, and normalises pasted text such as ` cyl-012345 `.
 - **Forms check input with the same rules as the API**, and if the server still rejects a request, a pop-up shows its title, message, field errors and HTTP code. The errors are also attached to the matching fields.
 
@@ -128,7 +133,7 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 
 ### Status rules and Analytics
 
-- **Status rules is one read-only table:** each status, its meaning in a plain sentence, a "Can move to" list and how many cylinders are in it. A from/to grid would need three kinds of cell to say what five short lists say. Retired says "None. Retired is final." The statuses are fixed because the requirement defines exactly five.
+- **Status rules is one read-only table:** each status, its meaning in a plain sentence, a "Can move to" list and how many cylinders are in it. A from/to grid would need three kinds of cell to say what five short lists say. Retired says a grey "None", since its meaning already says it's final. The statuses are fixed because the requirement defines exactly five.
 - **Analytics opens with a "Fleet by status" strip of link tiles** instead of a status bar chart, because five numbers read better as numbers and each tile opens the filtered list. Below it: key figures, cylinders by gas type, a status-by-gas table, time since last movement, the customers holding the most cylinders and short highlights. The grid rows fill completely (6+6, 12, 8+4), so there are no ragged gaps.
 - **Charts never rely on colour alone.** One series uses one colour, status colours appear only where the data is a status, and every value is printed next to its mark.
 
@@ -146,9 +151,9 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **The mock API is a real implementation.** MSW answers real HTTP calls and saves to `localStorage`, so switching to the .NET API changes no UI code, and data survives a reload.
 - **The API is chosen at build time, with no fallback to the mock.** A silent fallback would hide a broken API behind fake data.
 - **One rules file with a C# twin.** The lifecycle and validation rules live in `src/lib/domain.ts` and are mirrored in `Domain/CylinderRules.cs`, so the client and server checks can't disagree.
-- **Column widths are percentages that add up to 100%, with a fixed table layout.** List: serial 15, gas 15, status 15, customer 15, updated 10, actions 30. History: 15/15/50/20. Status rules: 20/35/35/10. Columns stay in the same place on every page, while loading and whatever the data holds. Long values truncate or wrap inside their cell, and a date wider than the Updated column runs into the empty left side of the Actions column instead of being cut.
+- **Column widths are percentages that add up to 100%, with a fixed table layout.** List: two sets, switched by the list's width: serial 17, gas 17, status 40, updated 12, actions 14 with icons, and 15/15/33/10/27 with labels (Actions 14% still fits the three icons at the 880px minimum). History: 15/15/50/20. Status rules: 20/35/35/10. Columns stay in the same place on every page, while loading and whatever the data holds. Long values truncate or wrap inside their cell, and a date wider than the Updated column runs into the empty left side of the Actions column instead of being cut.
 - **Tables keep an 880px minimum width and scroll sideways from 761px up.** Below that width, a serial or an "In maintenance" badge would be squeezed.
-- **Container queries, not window media queries, for the action labels and for stacking history below 960px.** They react to the card's own width, so the sidebar doesn't throw them off.
+- **Container queries, not window media queries, for the action labels, the list's column widths and stacking history below 960px.** They react to the card's own width, so the sidebar doesn't throw them off. The list measures itself rather than the Actions cell, because a cell that shrinks to icons could never grow back wide enough to show the labels.
 - **URL state is written with `replace`**, so a filtered view can be shared without filling Back with every keystroke.
 - **Select and the ⋯ menu use the Popover API**, so the browser provides the top layer and light dismiss without a positioning library.
 - **TanStack Query keeps the previous page while the next one loads, and retries once, only on network errors and 5xx.** A 400 or 409 is an answer, not a glitch, so retrying it is pointless.
@@ -163,6 +168,7 @@ CORS allows `http://localhost:5173` and `http://localhost:4173` by default. You 
 - **Errors are RFC 7807 problem details** with a field-keyed `errors` object, which the frontend shows in the pop-up and on the matching field.
 - **Duplicate serials are blocked twice.** Serials are stored in upper case under a unique index. The API checks for a clash first to return a clean 409, and if two requests race past that check, the unique index catches the second one, which also gets a 409, never a 500.
 - **Search with accents.** SQLite's `LIKE` and `lower()` only fold ASCII, so each row keeps an upper-cased `SearchKey` (serial + customer), and the search term is upper-cased in C# before matching.
+- **Retired is enforced on the server, not just hidden in the UI.** `PUT /api/cylinders/{id}` on a Retired cylinder returns 409 Conflict ("Cylinder is retired") and changes nothing, in both the .NET API and the mock. I chose 409 rather than 400 because the request itself is valid; it clashes with the cylinder's current state. The check runs before validation, so a stale tab or a direct API call gets the real reason first.
 - **Server-controlled fields.** `lastUpdated` is set only by the server, through an injected `TimeProvider` so the tests can freeze the clock. Status and customer change only through the status endpoint. Times are stored and sent as UTC.
 - **History is append-only.** Each entry is written in the same database save as the change, so a cylinder can't change without its entry. There is no endpoint to edit or delete history, and SQLite triggers reject `UPDATE` and `DELETE` on the history table even from direct database access (the mock freezes its entries). Saving an edit with no real change writes nothing. The 87 imported cylinders get exactly one "Imported" entry at the file's own timestamp, recorded by "System import"; nothing earlier is invented.
 - **`actionBy` comes from the server, never the request**, so a client can't claim to be someone else. There's no sign-in yet, so every change is recorded as a demo account ("Rina Wulandari", configurable with `DemoUser`). With real sign-in, the same field would come from the signed-in user.

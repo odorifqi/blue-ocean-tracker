@@ -23,6 +23,10 @@ export const STATUS_RULES = STATUSES.map((status) => ({
   isFinal: TRANSITIONS[status].length === 0,
 }))
 
+// Retired is final for the record too: a retired cylinder keeps the serial and gas type it
+// left service with, so its history and the analytics stay true to what was retired.
+export const canEdit = (status: CylinderStatus) => status !== 'Retired'
+
 export const STATUS_LABEL: Record<CylinderStatus, string> = {
   Empty: 'Empty',
   Filled: 'Filled',

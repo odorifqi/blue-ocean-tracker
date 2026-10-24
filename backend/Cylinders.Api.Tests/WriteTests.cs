@@ -69,6 +69,23 @@ public class CreateAndUpdateTests
         Assert.Equal(HttpStatusCode.Conflict, (await client.PutAsJsonAsync("/api/cylinders/2", new { serialNumber = "CYL-111111", gasType = "Argon" })).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/cylinders/9999")).StatusCode);
     }
+
+    [Fact]
+    public async Task Update_on_a_retired_cylinder_returns_409_and_changes_nothing()
+    {
+        using var app = new TestApp();
+        var client = app.CreateClient();
+        var created = await (await client.PostAsJsonAsync("/api/cylinders", new { serialNumber = "CYL-777777", gasType = "Oxygen" })).Read<CylinderBody>();
+        await client.PostAsJsonAsync($"/api/cylinders/{created.Id}/status", new { status = "Retired" });
+
+        var res = await client.PutAsJsonAsync($"/api/cylinders/{created.Id}", new { serialNumber = "CYL-777778", gasType = "Argon" });
+        Assert.Equal(HttpStatusCode.Conflict, res.StatusCode);
+        Assert.Equal("Cylinder is retired", (await res.Read<ProblemBody>()).Title);
+
+        var after = await (await client.GetAsync($"/api/cylinders/{created.Id}")).Read<CylinderBody>();
+        Assert.Equal("CYL-777777", after.SerialNumber);
+        Assert.Equal("Oxygen", after.GasType);
+    }
 }
 
 public class StatusTests

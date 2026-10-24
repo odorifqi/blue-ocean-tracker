@@ -193,35 +193,64 @@
 /* Fixed layout: the <col> percentages decide the widths, not the content, so columns stay put
    from page to page and while loading. Long values wrap or truncate inside their cell. */
 .cyl-table { table-layout: fixed; }
-/* At 10%, a date like "2 weeks ago" is wider than its column below ~1900px. Both sit next to the
-   Actions column, whose left part is always empty (buttons are right-aligned), so it may run into it
-   instead of being clipped. The header is raised above its neighbour so it is never painted over. */
+/* Column widths, two sets that each add up to 100%: a narrow Actions column for the icon-only
+   buttons and a wide one for the labelled buttons. The list itself is the size container, not the
+   Actions cell: a cell that measured itself could never grow back wide enough once it shrank to icons. */
+.list__body { container: cyl-list / inline-size; }
+.cyl-col--serial { width: 17%; }
+.cyl-col--gas { width: 17%; }
+.cyl-col--status { width: 40%; }
+.cyl-col--updated { width: 12%; }
+.cyl-col--actions { width: 14%; }
+@container cyl-list (min-width: 1200px) {
+  .cyl-col--serial, .cyl-col--gas { width: 15%; }
+  .cyl-col--status { width: 33%; }
+  .cyl-col--updated { width: 10%; }
+  .cyl-col--actions { width: 27%; }
+}
+/* A date like "2 weeks ago" can be a little wider than the Updated column. It sits next to the Actions
+   column, whose left part is always empty (buttons are right-aligned), so it may run into it instead of
+   being clipped. The header is raised above its neighbour so it is never painted over. */
 .cyl-table__updated { z-index: 2 !important; }
-/* Below ~880px of table width the 15% columns get narrower than a serial or an "In maintenance" badge.
-   Rather than squeeze or clip them, the table keeps 880px and the results scroll sideways (small laptops
+/* Below this width the narrow columns get tighter than a serial or an "In maintenance" badge. Rather
+   than squeeze or clip them, the table keeps its minimum and the results scroll sideways (small laptops
    and tablets only; phones use the stacked layout). */
 @media (min-width: 761px) {
   .cyl-table, .rules__statuses { min-width: 880px; }
   .cyl-table .serial { display: block; overflow: hidden; text-overflow: ellipsis; }
   .list__body { overflow-x: auto; }
 }
-.table__status { display: inline-flex; gap: var(--space-2); align-items: center; white-space: nowrap; }
-.table__status-idle:empty { display: none; }
+/* Status cell: [status] With <customer> [Out Nd]. One line; the name shrinks and "Out Nd" stays right after it. */
+.table__state { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.table__badge, .table__idle { flex: none; display: inline-flex; }
+.table__idle:empty { display: none; }
+.table__sub, .table__line { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.table__with { display: flex; gap: 0.3em; min-width: 0; white-space: nowrap; }
+.table__with-label { color: var(--fg-subtle); }
+/* 1280px and below the one line would cut most names, so the customer drops under the badge, like the
+   History Change cell. Rows with a customer get taller; the others keep 52px. */
+@media (min-width: 761px) and (max-width: 1280px) {
+  .table__state { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+  .table__sub { max-width: 100%; }
+}
 .table__actions { white-space: nowrap; }
 .table td.table__actions { padding-left: 0; padding-right: var(--space-3); }
-.table__actions-inner { container-type: inline-size; display: flex; justify-content: flex-end; gap: var(--space-1); }
-/* Quiet buttons are a little tighter here, so all three labels (317px) fit in a 30% column from a ~1440px window. */
+.table__actions-inner { display: flex; justify-content: flex-end; gap: var(--space-1); }
+/* Quiet buttons are a little tighter here, so all three labels fit in the wide Actions column. */
 .table__actions .row-quiet { padding: 0 6px; gap: var(--space-1); }
-/* Too narrow for all three labels: all three drop to icons together, so the set never mixes words and icons.
-   Detail keeps its blue tint, so it still reads as the main action. Names stay in tooltips and accessible names. */
-@container (max-width: 319px) {
+/* Below that, all three drop to icons together, so the set never mixes words and icons. Detail keeps
+   its blue tint, so it still reads as the main action. Names stay in tooltips and accessible names. */
+@container cyl-list (max-width: 1199.98px) {
   .table__actions-inner .btn { width: var(--btn-h); padding: 0; }
   .table__actions-inner .btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* The ⋯ menu and the phone-only pieces of the card exist only in the phone layout. */
 .table__menu, .table__card-only { display: none; }
-.table__with { display: block; min-width: 0; }
-.serial { color: var(--fg-default); font-weight: var(--weight-medium); white-space: nowrap; }
+.serial { white-space: nowrap; }
+/* Plain cell values share one style: regular weight, default colour, the table's size. Grey (.muted) is
+   only for things that aren't values: the "—" placeholder, field labels, the struck-out old value. A serial
+   alone in its cell is a value, so it drops the 0.92em that .mono uses for code inside running text. */
+.table .mono { font-size: 1em; }
 .muted { color: var(--fg-subtle); }
 .nowrap { white-space: nowrap; }
 .break { overflow-wrap: anywhere; }
@@ -232,28 +261,27 @@
   .table, .table tbody, .table tr, .table td { display: block; }
   .table td { height: auto; padding: 0; border: 0; }
   .table__grow { max-width: none; width: auto; }
+  .cyl-table .serial { font-weight: var(--weight-medium); } /* the card's title */
   /* Phone card, read top to bottom: serial with the ⋯ button, status and gas, "With <customer>" and "Out Nd"
      (only when someone has the cylinder), then the update time. The gas column can shrink, so a long
      status + gas pair can never push the ⋯ button off the card; a long customer ends in "…" and the
      "Out Nd" badge beside it always shows. */
   .table__row {
     display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: 'serial serial menu' 'status gas menu' 'sub sub sub';
+    grid-template-areas: 'serial serial menu' 'badge gas menu' 'sub sub sub';
     gap: 6px var(--space-3); align-items: center; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-subtle);
   }
   .table__row:hover { background: none; }
   .cyl-table td[data-label='Serial number'] { grid-area: serial; min-width: 0; }
-  .cyl-table td[data-label='Status'] { grid-area: status; }
+  /* The Status cell's pieces join the card grid: the badge sits by the gas, the customer line and time below. */
+  .cyl-table td[data-label='Status'], .cyl-table .table__state { display: contents; }
+  .cyl-table .table__badge { grid-area: badge; }
+  .cyl-table .table__sub { grid-area: sub; flex-direction: column; align-items: stretch; gap: 6px; white-space: nowrap; font-size: var(--text-sm); color: var(--fg-subtle); }
+  .cyl-table .table__line { justify-content: flex-start; }
   .cyl-table td[data-label='Gas'] { grid-area: gas; min-width: 0; overflow: hidden; }
-  .cyl-table .table__status-idle { display: none; }
   .cyl-table td[data-label='Updated'], .cyl-table .table__actions { display: none !important; }
-  .cyl-table td[data-label='Customer'] { grid-area: sub; display: grid; grid-template-columns: minmax(0, auto) auto 1fr; gap: 4px var(--space-2); align-items: center; min-width: 0; white-space: nowrap; font-size: var(--text-sm); color: var(--fg-subtle); }
-  .cyl-table td[data-label='Customer'] > .muted { display: none; }
   .table__card-only { display: inline; }
-  .table__with { display: flex; gap: 0.3em; min-width: 0; }
   .table__with .customer { color: var(--fg-muted); font-weight: var(--weight-medium); }
-  .table__card-idle:empty { display: none; }
-  .table__card-time { grid-column: 1 / -1; }
   .cyl-table td.table__menu { display: block; grid-area: menu; align-self: start; justify-self: end; }
   .table__menu .menu-trigger { --btn-h: 36px; }
 }
@@ -323,7 +351,10 @@
 .status-option__name { font-size: var(--text-md); font-weight: var(--weight-medium); }
 .status-option__usual { font-size: 11px; font-weight: var(--weight-semibold); color: var(--fg-muted); background: var(--bg-muted); border-radius: var(--radius-full); padding: 1px 7px; }
 .status-option input { position: absolute; opacity: 0; pointer-events: none; }
-.status-option:hover { border-color: var(--border-strong); }
+.status-option:hover:not(:has(input:disabled)) { border-color: var(--border-strong); }
+/* While saving: the picked option stays at full strength (it is what's being saved), the rest fade. */
+.status-option:has(input:disabled) { cursor: not-allowed; }
+.status-option:has(input:disabled):not(.is-selected) { opacity: 0.55; }
 .status-option.is-selected { border-color: var(--accent); background: var(--accent-subtle); box-shadow: 0 0 0 1px var(--accent); }
 .status-option.is-danger.is-selected { border-color: var(--danger); background: var(--danger-subtle); box-shadow: 0 0 0 1px var(--danger); }
 .status-option:has(input:focus-visible) { box-shadow: 0 0 0 3px var(--focus-ring); }
@@ -393,8 +424,8 @@
 .history__table { table-layout: fixed; }
 .history__table td { height: 48px; padding: var(--space-2) var(--space-3); font-size: var(--text-sm); }
 .history__table th { padding: 0 var(--space-3); position: static; }
-.history__when { color: var(--fg-muted); white-space: nowrap; }
-.history__event { display: inline-flex; max-width: 100%; min-width: 0; align-items: center; gap: var(--space-2); font-weight: var(--weight-medium); white-space: nowrap; }
+.history__when { white-space: nowrap; }
+.history__event { display: inline-flex; max-width: 100%; min-width: 0; align-items: center; gap: var(--space-2); white-space: nowrap; }
 /* Safety net: a label that doesn't fit is cut inside its own cell, never drawn over the next one. */
 .history__event-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .history__event svg { color: var(--fg-subtle); flex: none; }

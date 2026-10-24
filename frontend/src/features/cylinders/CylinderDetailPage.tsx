@@ -3,7 +3,7 @@ import { useState, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button, EmptyState, ErrorState, Skeleton, StatusBadge, useToast } from '../../ds'
 import { ApiError } from '../../lib/api'
-import { PRIMARY_NEXT, STATUS_ACTION, STATUS_DESCRIPTION, STATUS_LABEL, TRANSITIONS, type CylinderStatus } from '../../lib/domain'
+import { PRIMARY_NEXT, STATUS_ACTION, STATUS_DESCRIPTION, STATUS_LABEL, TRANSITIONS, canEdit, type CylinderStatus } from '../../lib/domain'
 import { GAS_META } from '../../lib/gas'
 import { absoluteTime, relativeTime, utcTime } from '../../lib/format'
 import { useCylinder } from '../../lib/queries'
@@ -112,7 +112,15 @@ export function CylinderDetailPage() {
           {/* Editing sits with the fields it changes, not in the page header. */}
           <div className="card__head card__head--row">
             <h2 id="details-h" className="card__title">Details</h2>
-            <Button size="sm" icon={<PencilLine size={15} />} onClick={() => setEditing(true)}>Edit details</Button>
+            <Button
+              size="sm"
+              icon={<PencilLine size={15} />}
+              disabled={!canEdit(c.status)}
+              title={canEdit(c.status) ? undefined : 'Retired cylinders can’t be edited'}
+              onClick={() => setEditing(true)}
+            >
+              Edit details
+            </Button>
           </div>
           <dl className="props">
             <div><dt>Record ID</dt><dd className="mono">#{c.id}</dd></div>

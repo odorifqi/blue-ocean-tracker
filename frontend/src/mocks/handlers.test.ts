@@ -40,4 +40,14 @@ describe('mock API contract', () => {
     expect((await delivered.json()).customerName).toBe("PT Café O'Brien")
     expect((await get('/api/cylinders/123456')).status).toBe(404)
   })
+
+  it('refuses to edit a retired cylinder with 409 and leaves it unchanged', async () => {
+    const c = await (await send('POST', '/api/cylinders', { serialNumber: 'CYL-888888', gasType: 'Oxygen' })).json()
+    await send('POST', `/api/cylinders/${c.id}/status`, { status: 'Retired' })
+
+    const res = await send('PUT', `/api/cylinders/${c.id}`, { serialNumber: 'CYL-888889', gasType: 'Argon' })
+    expect(res.status).toBe(409)
+    expect(await res.json()).toMatchObject({ title: 'Cylinder is retired' })
+    expect(await (await get(`/api/cylinders/${c.id}`)).json()).toMatchObject({ serialNumber: 'CYL-888888', gasType: 'Oxygen' })
+  })
 })

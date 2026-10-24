@@ -77,7 +77,7 @@ describe('Cylinders list page', () => {
     const row = rows()[0]
     // Detail is the row's only link; the serial is plain text.
     expect(within(row).getAllByRole('link')).toHaveLength(1)
-    await user.click(row.querySelector('td[data-label="Customer"]')!)
+    await user.click(row.querySelector('td[data-label="Status"]')!)
     await user.click(row.querySelector('.serial')!)
     expect(screen.queryByText('other page')).not.toBeInTheDocument()
 
@@ -107,7 +107,7 @@ describe('Cylinders list page', () => {
     expect(await screen.findByText('other page')).toBeInTheDocument()
   })
 
-  it('disables Change status in the menu of a Retired cylinder and says why', async () => {
+  it('disables Edit details and Change status on a Retired row, in the row and in the menu, and says why', async () => {
     const user = userEvent.setup()
     renderWithApp(<CylindersPage />)
     await waitFor(() => expect(rows()).toHaveLength(10))
@@ -115,10 +115,17 @@ describe('Cylinders list page', () => {
     await waitFor(() => expect(rows()).toHaveLength(2))
 
     const row = rows()[0]
+    const edit = within(row).getByRole('button', { name: /^Edit details for / })
+    expect(edit).toBeDisabled()
+    expect(edit).toHaveAttribute('title', 'Retired cylinders can’t be edited')
+
     await user.click(within(row).getByRole('button', { name: /^Actions for / }))
     const item = screen.getByRole('menuitem', { name: /Change status/ })
     expect(item).toBeDisabled()
     expect(item).toHaveTextContent('Retired is final')
+    const editItem = screen.getByRole('menuitem', { name: /Edit details/ })
+    expect(editItem).toBeDisabled()
+    expect(editItem).toHaveTextContent('Retired is read-only')
   })
 
   it('filters by status', async () => {

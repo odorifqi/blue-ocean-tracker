@@ -11,7 +11,7 @@ describe('Status rules page', () => {
     const filled = await screen.findByRole('list', { name: 'Filled can move to' })
     const next = within(filled).getAllByRole('listitem').map((li) => li.textContent)
     expect(next).toEqual(['Delivered', 'In maintenance', 'Retired'])
-    expect(screen.getByText('None. Retired is final.')).toBeInTheDocument()
+    expect(screen.getByText('None')).toBeInTheDocument()
     expect(screen.getByText(/ready to be filled or inspected\. New cylinders start here\./)).toBeInTheDocument()
     expect(screen.queryByText('Allowed moves')).not.toBeInTheDocument()
   })

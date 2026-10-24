@@ -17,7 +17,7 @@ import {
   type FilterOption,
 } from '../../ds'
 import type { Cylinder } from '../../lib/api'
-import { STATUSES, STATUS_LABEL, isStatus, type CylinderStatus } from '../../lib/domain'
+import { STATUSES, STATUS_LABEL, canEdit, isStatus, type CylinderStatus } from '../../lib/domain'
 import { absoluteTime, relativeTime } from '../../lib/format'
 import { useDebounced, useDocumentTitle } from '../../lib/hooks'
 import { useCylinders, useSummary } from '../../lib/queries'
@@ -258,7 +258,6 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
           <th scope="col">Serial number</th>
           <th scope="col">Gas</th>
           <th scope="col">Status</th>
-          <th scope="col">Customer</th>
           <th scope="col" className="cyl-table__updated">Updated</th>
           <th scope="col"><span className="sr-only">Actions</span></th>
         </tr>
@@ -274,40 +273,41 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
               </span>
             </td>
             <td data-label="Gas"><GasSwatch gas={c.gasType} /></td>
+            {/* The customer only exists while a cylinder is Delivered, so it lives in the Status cell,
+                like "To X" in the History Change cell, instead of a column of dashes:
+                [status] With <customer> [Out Nd]. One line on wide screens, two at 1280px and below. */}
             <td data-label="Status">
-              <span className="table__status">
-                <StatusBadge status={c.status} size="sm" />
-                <span className="table__status-idle"><IdleBadge cylinder={c} /></span>
+              <span className="table__state">
+                <span className="table__badge"><StatusBadge status={c.status} size="sm" /></span>
+                <span className="table__sub">
+                  {c.customerName && (
+                    <span className="table__line">
+                      <span className="table__with">
+                        <span className="table__with-label">With</span>
+                        <Truncate text={c.customerName} className="customer">
+                          <Highlight text={c.customerName} query={search} />
+                        </Truncate>
+                      </span>
+                      <span className="table__idle"><IdleBadge cylinder={c} /></span>
+                    </span>
+                  )}
+                  {/* Phones show the time on its own line; the Updated cell is hidden there. */}
+                  <span className="table__card-only table__card-time">Updated {relativeTime(c.lastUpdated)}</span>
+                </span>
               </span>
             </td>
-            <td data-label="Customer" className="table__customer">
-              {c.customerName ? (
-                <span className="table__with">
-                  <span className="table__card-only">With</span>
-                  <Truncate text={c.customerName} className="customer">
-                    <Highlight text={c.customerName} query={search} />
-                  </Truncate>
-                </span>
-              ) : (
-                <span className="muted" aria-label="No customer">—</span>
-              )}
-              {/* Phones put "Out Nd" beside the customer who has the cylinder, and the time on its own
-                  line; the Status and Updated cells drop those there. */}
-              <span className="table__card-only table__card-idle"><IdleBadge cylinder={c} /></span>
-              <span className="table__card-only table__card-time">Updated {relativeTime(c.lastUpdated)}</span>
-            </td>
             <td data-label="Updated" className="nowrap">
-              <time dateTime={c.lastUpdated} title={absoluteTime(c.lastUpdated)} className="muted tabular">
+              <time dateTime={c.lastUpdated} title={absoluteTime(c.lastUpdated)} className="tabular">
                 {relativeTime(c.lastUpdated)}
               </time>
             </td>
             <td className="table__actions">
               {/* Two equal quiet actions, then Detail, the one tinted action in the row.
                   The serial is in each accessible name, so ten "Detail" links stay distinguishable.
-                  The wrapper is a size container: all three labels show whenever they fit; when they
-                  don't, all three drop to icons together. */}
+                  All three labels show when the list is wide enough for them; otherwise all three drop
+                  to icons together (see .list__body in app.css). */}
               <div className="table__actions-inner">
-              <Button size="sm" variant="ghost" className="row-quiet" icon={<PencilLine size={15} />} aria-label={`Edit details for ${c.serialNumber}`} title="Edit details" onClick={() => onEdit(c)}>
+              <Button size="sm" variant="ghost" className="row-quiet" icon={<PencilLine size={15} />} aria-label={`Edit details for ${c.serialNumber}`} onClick={() => onEdit(c)} disabled={!canEdit(c.status)} title={canEdit(c.status) ? 'Edit details' : 'Retired cylinders can’t be edited'}>
                 <span className="btn__label">Edit details</span>
               </Button>
               <Button size="sm" variant="ghost" className="row-quiet" icon={<Repeat2 size={15} />} aria-label={`Change status for ${c.serialNumber}`} onClick={() => onChangeStatus(c)} disabled={c.status === 'Retired'} title={c.status === 'Retired' ? 'Retired cylinders can’t change status' : 'Change status'}>
@@ -324,7 +324,7 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
                 label={`Actions for ${c.serialNumber}`}
                 items={[
                   { label: 'Detail', icon: <Info size={16} />, primary: true, onSelect: () => navigate(`/cylinders/${c.id}`) },
-                  { label: 'Edit details', icon: <PencilLine size={16} />, separated: true, onSelect: () => onEdit(c) },
+                  { label: 'Edit details', icon: <PencilLine size={16} />, separated: true, onSelect: () => onEdit(c), disabled: !canEdit(c.status), hint: 'Retired is read-only' },
                   { label: 'Change status', icon: <Repeat2 size={16} />, onSelect: () => onChangeStatus(c), disabled: c.status === 'Retired', hint: 'Retired is final' },
                 ]}
               />
@@ -336,16 +336,16 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
   )
 }
 
-/** Rifqi's widths, shared by the table and its skeleton so nothing shifts when data arrives. Sums to 100%. */
+/** Column widths (set in app.css, one set with icons and one with labels, each summing to 100%),
+    shared by the table and its skeleton so nothing shifts when data arrives. */
 function CylinderCols() {
   return (
     <colgroup>
-      <col style={{ width: '15%' }} />
-      <col style={{ width: '15%' }} />
-      <col style={{ width: '15%' }} />
-      <col style={{ width: '15%' }} />
-      <col style={{ width: '10%' }} />
-      <col style={{ width: '30%' }} />
+      <col className="cyl-col cyl-col--serial" />
+      <col className="cyl-col cyl-col--gas" />
+      <col className="cyl-col cyl-col--status" />
+      <col className="cyl-col cyl-col--updated" />
+      <col className="cyl-col cyl-col--actions" />
     </colgroup>
   )
 }
@@ -356,7 +356,7 @@ function TableSkeleton({ rows }: { rows: number }) {
       <CylinderCols />
       <thead>
         <tr>
-          {['Serial number', 'Gas', 'Status', 'Customer', 'Updated', ''].map((h, i) => <th key={i}>{h}</th>)}
+          {['Serial number', 'Gas', 'Status', 'Updated', ''].map((h, i) => <th key={i}>{h}</th>)}
         </tr>
       </thead>
       <tbody>
@@ -365,8 +365,7 @@ function TableSkeleton({ rows }: { rows: number }) {
             {/* Same cells and labels as a real row, so the phone card skeleton has the real card's shape. */}
             <td data-label="Serial number"><Skeleton width={92} /></td>
             <td data-label="Gas"><Skeleton width={70} /></td>
-            <td data-label="Status"><Skeleton width={74} height={20} radius={99} /></td>
-            <td data-label="Customer"><Skeleton width={`${40 + ((i * 37) % 45)}%`} /></td>
+            <td data-label="Status"><Skeleton width={`${30 + ((i * 37) % 45)}%`} height={20} radius={99} /></td>
             <td data-label="Updated"><Skeleton width={72} /></td>
             <td className="table__actions"><Skeleton width="100%" height={28} /></td>
             <td className="table__menu"><Skeleton width={36} height={36} /></td>

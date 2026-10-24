@@ -105,7 +105,7 @@ function meaning(r: StatusRule) {
 function NextStatuses({ rule, meta }: { rule: StatusRule; meta: Meta }) {
   const next = meta.statuses.filter((s) => meta.transitions[rule.status]?.includes(s))
   if (next.length === 0) {
-    return <span className="muted">{rule.isFinal ? `None. ${STATUS_LABEL[rule.status]} is final.` : 'None.'}</span>
+    return <span className="muted">None</span>
   }
   return (
     <ul className="rules__moves" aria-label={`${STATUS_LABEL[rule.status]} can move to`}>

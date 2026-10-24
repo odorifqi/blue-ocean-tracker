@@ -108,10 +108,18 @@ export function StatusChangeDialog({ cylinder, open, onClose, initialStatus }: P
           <span className="field__label" id="next-status-label">Choose the next status</span>
           <span className="status-group__count">{options.length} allowed</span>
         </div>
-        <div className="status-options" role="radiogroup" aria-labelledby="next-status-label">
+        {/* Locked while saving, so the choice can't drift from the request already sent. */}
+        <div className="status-options" role="radiogroup" aria-labelledby="next-status-label" aria-disabled={mutation.isPending || undefined}>
           {options.map((s) => (
             <label key={s} className={clsx('status-option', target === s && 'is-selected', s === 'Retired' && 'is-danger')}>
-              <input type="radio" name="next-status" value={s} checked={target === s} onChange={() => setTarget(s)} />
+              <input
+                type="radio"
+                name="next-status"
+                value={s}
+                checked={target === s}
+                disabled={mutation.isPending}
+                onChange={() => setTarget(s)}
+              />
               <span className="status-option__radio" aria-hidden />
               <span className="status-option__head">
                 {/* A dot, not the pill: the pill means "the status it is in now". */}

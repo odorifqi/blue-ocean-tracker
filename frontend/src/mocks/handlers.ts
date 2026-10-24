@@ -6,6 +6,7 @@ import {
   STATUSES,
   STATUS_RULES,
   TRANSITIONS,
+  canEdit,
   canTransition,
   isIdle,
   isStatus,
@@ -62,6 +63,9 @@ const duplicate = (serial: string) =>
   problem(409, 'Duplicate serial number', `A cylinder with serial number ${serial} already exists.`, {
     serialNumber: [`${serial} is already registered.`],
   })
+
+const retired = (serial: string) =>
+  problem(409, 'Cylinder is retired', `${serial} is retired, so its details can no longer be edited.`)
 
 const HISTORY_FILTERS = {
   all: () => true,
@@ -201,6 +205,7 @@ export const handlers = [
     if (fail) return fail
     const current = db.find(Number(params.id))
     if (!current) return notFound(Number(params.id))
+    if (!canEdit(current.status)) return retired(current.serialNumber)
     const input = readInput(await request.json().catch(() => ({})))
     const errors = inputErrors(input)
     if (Object.keys(errors).length) return validation(errors)

@@ -172,6 +172,8 @@ public static class CylinderEndpoints
     {
         var cylinder = await db.Cylinders.FindAsync(id);
         if (cylinder is null) return NotFound(id);
+        // Retired is final for the record too: it keeps the serial and gas type it left service with.
+        if (cylinder.Status == CylinderStatus.Retired) return Retired(cylinder.SerialNumber);
 
         var (serial, gas, errors) = Validate(input);
         if (errors.Count > 0) return Results.ValidationProblem(errors);
@@ -334,6 +336,11 @@ public static class CylinderEndpoints
         {
             ["errors"] = new Dictionary<string, string[]> { ["serialNumber"] = [$"{serial} is already registered."] },
         });
+
+    private static IResult Retired(string serial) => Results.Problem(
+        statusCode: StatusCodes.Status409Conflict,
+        title: "Cylinder is retired",
+        detail: $"{serial} is retired, so its details can no longer be edited.");
 
     private static IResult NotFound(int id) => Results.Problem(
         statusCode: StatusCodes.Status404NotFound, title: "Cylinder not found", detail: $"No cylinder with id {id}.");
