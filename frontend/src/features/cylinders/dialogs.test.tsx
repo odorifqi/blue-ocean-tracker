@@ -59,6 +59,9 @@ describe('Status change', () => {
 
     const options = screen.getAllByRole('radio').map((r) => (r as HTMLInputElement).value)
     expect(options).toEqual(['Delivered', 'InMaintenance', 'Retired'])
+    expect(screen.getByRole('radiogroup', { name: 'Choose the next status' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Delivered.*Usual next step/ })).not.toBeChecked()
+    expect(screen.getAllByText('Usual next step')).toHaveLength(1)
 
     await user.click(screen.getByRole('radio', { name: /Delivered/ }))
     await user.click(screen.getByRole('button', { name: 'Deliver to customer' }))

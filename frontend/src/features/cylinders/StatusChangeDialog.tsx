@@ -1,10 +1,11 @@
 import clsx from 'clsx'
 import { ArrowRight, Repeat2, TriangleAlert } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dialog, Field, Input, StatusBadge, useToast } from '../../ds'
+import { Button, Dialog, Field, Input, StatusBadge, statusKey, useToast } from '../../ds'
 import { ApiError, type Cylinder } from '../../lib/api'
 import {
   CUSTOMER_NAME_MAX,
+  PRIMARY_NEXT,
   STATUS_ACTION,
   STATUS_DESCRIPTION,
   STATUS_LABEL,
@@ -92,22 +93,36 @@ export function StatusChangeDialog({ cylinder, open, onClose, initialStatus }: P
         </>
       }
     >
-      <div className="transition-summary" aria-live="polite">
-        <StatusBadge status={cylinder.status} />
-        <ArrowRight size={16} className="transition-summary__arrow" aria-hidden />
-        {target ? <StatusBadge status={target} /> : <span className="transition-summary__placeholder">Next status</span>}
+      {/* Two labelled groups: the move being made (a fact, flat) and the moves allowed (choices, bordered). */}
+      <div className="status-group">
+        <span className="field__label" id="status-change-label">Status change</span>
+        <div className="transition-summary" aria-labelledby="status-change-label" aria-live="polite">
+          <StatusBadge status={cylinder.status} />
+          <ArrowRight size={16} className="transition-summary__arrow" aria-hidden />
+          {target ? <StatusBadge status={target} /> : <span className="transition-summary__placeholder">Next status</span>}
+        </div>
       </div>
 
-      <div className="status-options" role="radiogroup" aria-label="Next status">
-        {options.map((s) => (
-          <label key={s} className={clsx('status-option', target === s && 'is-selected', s === 'Retired' && 'is-danger')}>
-            <input type="radio" name="next-status" value={s} checked={target === s} onChange={() => setTarget(s)} />
-            <span className="status-option__head">
-              <StatusBadge status={s} size="sm" />
-            </span>
-            <span className="status-option__desc">{STATUS_DESCRIPTION[s]}</span>
-          </label>
-        ))}
+      <div className="status-group">
+        <div className="status-group__label">
+          <span className="field__label" id="next-status-label">Choose the next status</span>
+          <span className="status-group__count">{options.length} allowed</span>
+        </div>
+        <div className="status-options" role="radiogroup" aria-labelledby="next-status-label">
+          {options.map((s) => (
+            <label key={s} className={clsx('status-option', target === s && 'is-selected', s === 'Retired' && 'is-danger')}>
+              <input type="radio" name="next-status" value={s} checked={target === s} onChange={() => setTarget(s)} />
+              <span className="status-option__radio" aria-hidden />
+              <span className="status-option__head">
+                {/* A dot, not the pill: the pill means "the status it is in now". */}
+                <span className={clsx('status__dot', `status--${statusKey(s)}`)} aria-hidden />
+                <span className="status-option__name">{STATUS_LABEL[s]}</span>
+                {PRIMARY_NEXT[cylinder.status] === s && <span className="status-option__usual">Usual next step</span>}
+              </span>
+              <span className="status-option__desc">{STATUS_DESCRIPTION[s]}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {needsCustomer && (
@@ -145,7 +160,8 @@ export function StatusChangeDialog({ cylinder, open, onClose, initialStatus }: P
       )}
       {cylinder.status === 'Delivered' && target === 'Empty' && cylinder.customerName && (
         <p className="callout">
-          Returning clears the customer <strong>{cylinder.customerName}</strong> from this cylinder.
+          {/* One span so the flex callout keeps this as a single wrapping sentence. */}
+          <span>Returning clears the customer <strong>{cylinder.customerName}</strong> from this cylinder.</span>
         </p>
       )}
     </Dialog>

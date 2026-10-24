@@ -294,20 +294,36 @@
 .review__row.is-changed ins { color: var(--accent-fg); }
 .review__muted { color: var(--fg-subtle); font-weight: var(--weight-regular); font-size: var(--text-sm); }
 
-.transition-summary { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: var(--bg-subtle); border-radius: var(--radius-md); border: 1px dashed var(--border-strong); }
+.status-group { display: flex; flex-direction: column; gap: 6px; }
+.status-group + .status-group { margin-top: var(--space-2); }
+.status-group__label { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
+.status-group__count { font-size: var(--text-xs); color: var(--fg-subtle); }
+/* The fact is flat (fill, no border) so it can't be mistaken for a choice. */
+.transition-summary { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: var(--bg-subtle); border-radius: var(--radius-md); }
 .transition-summary__arrow { color: var(--fg-subtle); }
 .transition-summary__placeholder { font-size: var(--text-xs); color: var(--fg-subtle); border: 1px dashed var(--border-strong); border-radius: var(--radius-full); padding: 2px 10px; }
 .status-options { display: flex; flex-direction: column; gap: var(--space-2); }
 .status-option {
-  position: relative; display: flex; flex-direction: column; gap: 4px; padding: var(--space-3) var(--space-4);
+  position: relative; display: grid; grid-template-columns: 18px 1fr; column-gap: var(--space-3); row-gap: 2px; align-items: center;
+  padding: var(--space-3) var(--space-4); background: var(--bg-surface);
   border: 1px solid var(--border-default); border-radius: var(--radius-md); cursor: pointer; transition: all var(--duration-fast);
 }
+/* Retired is the only permanent move, so it sits a little apart. */
+.status-option.is-danger { margin-top: var(--space-2); }
+.status-option__radio { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: var(--bg-surface); display: grid; place-items: center; }
+.status-option.is-selected .status-option__radio { border-color: var(--accent); }
+.status-option.is-selected .status-option__radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.status-option.is-danger.is-selected .status-option__radio { border-color: var(--danger); }
+.status-option.is-danger.is-selected .status-option__radio::after { background: var(--danger); }
+.status-option__head { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.status-option__name { font-size: var(--text-md); font-weight: var(--weight-medium); }
+.status-option__usual { font-size: 11px; font-weight: var(--weight-semibold); color: var(--fg-muted); background: var(--bg-muted); border-radius: var(--radius-full); padding: 1px 7px; }
 .status-option input { position: absolute; opacity: 0; pointer-events: none; }
 .status-option:hover { border-color: var(--border-strong); }
 .status-option.is-selected { border-color: var(--accent); background: var(--accent-subtle); box-shadow: 0 0 0 1px var(--accent); }
 .status-option.is-danger.is-selected { border-color: var(--danger); background: var(--danger-subtle); box-shadow: 0 0 0 1px var(--danger); }
 .status-option:has(input:focus-visible) { box-shadow: 0 0 0 3px var(--focus-ring); }
-.status-option__desc { font-size: var(--text-sm); color: var(--fg-muted); }
+.status-option__desc { grid-column: 2; font-size: var(--text-sm); color: var(--fg-muted); }
 
 .callout { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-3); border-radius: var(--radius-md); background: var(--bg-subtle); color: var(--fg-muted); font-size: var(--text-sm); overflow-wrap: anywhere; }
 .callout svg { flex: none; margin-top: 2px; }
