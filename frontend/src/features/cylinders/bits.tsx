@@ -47,7 +47,11 @@ export function IdleBadge({ cylinder }: { cylinder: Pick<Cylinder, 'status' | 'l
   const d = daysSince(cylinder.lastUpdated)
   return (
     <span title={`Delivered ${d} days ago and not returned yet`}>
-      <Badge tone="warning" icon={<Clock size={12} />}>Out {d}d</Badge>
+      <Badge tone="warning" icon={<Clock size={12} />}>
+        <span aria-hidden>Out {d}d</span>
+        {/* The tooltip never shows on touch screens, so the explanation is also in the text. */}
+        <span className="sr-only">Delivered {d} days ago and not returned yet</span>
+      </Badge>
     </span>
   )
 }

@@ -268,7 +268,7 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
             <td data-label="Status">
               <span className="table__status">
                 <StatusBadge status={c.status} size="sm" />
-                <IdleBadge cylinder={c} />
+                <span className="table__status-idle"><IdleBadge cylinder={c} /></span>
               </span>
             </td>
             <td data-label="Customer" className="table__customer">
@@ -282,10 +282,10 @@ function CylinderTable({ rowsKey, items, search, onEdit, onChangeStatus }: Table
               ) : (
                 <span className="muted" aria-label="No customer">—</span>
               )}
-              {/* Phones fold the time into the customer line; the Updated cell is hidden there. */}
-              <span className="table__card-only table__card-time">
-                {c.customerName && <span aria-hidden>· </span>}Updated {relativeTime(c.lastUpdated)}
-              </span>
+              {/* Phones put "Out Nd" beside the customer who has the cylinder, and the time on its own
+                  line; the Status and Updated cells drop those there. */}
+              <span className="table__card-only table__card-idle"><IdleBadge cylinder={c} /></span>
+              <span className="table__card-only table__card-time">Updated {relativeTime(c.lastUpdated)}</span>
             </td>
             <td data-label="Updated" className="nowrap">
               <time dateTime={c.lastUpdated} title={absoluteTime(c.lastUpdated)} className="muted tabular">

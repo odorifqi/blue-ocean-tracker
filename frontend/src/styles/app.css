@@ -206,6 +206,7 @@
   .list__body { overflow-x: auto; }
 }
 .table__status { display: inline-flex; gap: var(--space-2); align-items: center; white-space: nowrap; }
+.table__status-idle:empty { display: none; }
 .table__actions { white-space: nowrap; }
 .table td.table__actions { padding-left: 0; padding-right: var(--space-3); }
 .table__actions-inner { container-type: inline-size; display: flex; justify-content: flex-end; gap: var(--space-1); }
@@ -231,25 +232,28 @@
   .table, .table tbody, .table tr, .table td { display: block; }
   .table td { height: auto; padding: 0; border: 0; }
   .table__grow { max-width: none; width: auto; }
-  /* Phone card: three left-aligned lines read top to bottom (serial / status and gas / customer and time),
-     with every action behind the ⋯ button beside the serial. The customer shares the last line and is cut
-     with an ellipsis, so every card is the same height whatever the data. */
+  /* Phone card, read top to bottom: serial with the ⋯ button, status and gas, "With <customer>" and "Out Nd"
+     (only when someone has the cylinder), then the update time. The gas column can shrink, so a long
+     status + gas pair can never push the ⋯ button off the card; a long customer ends in "…" and the
+     "Out Nd" badge beside it always shows. */
   .table__row {
-    display: grid !important; grid-template-columns: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: 'serial serial serial menu' 'status gas . menu' 'sub sub sub sub';
+    display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'serial serial menu' 'status gas menu' 'sub sub sub';
     gap: 6px var(--space-3); align-items: center; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-subtle);
   }
   .table__row:hover { background: none; }
   .cyl-table td[data-label='Serial number'] { grid-area: serial; min-width: 0; }
   .cyl-table td[data-label='Status'] { grid-area: status; }
-  .cyl-table td[data-label='Gas'] { grid-area: gas; }
+  .cyl-table td[data-label='Gas'] { grid-area: gas; min-width: 0; overflow: hidden; }
+  .cyl-table .table__status-idle { display: none; }
   .cyl-table td[data-label='Updated'], .cyl-table .table__actions { display: none !important; }
-  .cyl-table td[data-label='Customer'] { grid-area: sub; display: flex; gap: 6px; min-width: 0; white-space: nowrap; font-size: var(--text-sm); color: var(--fg-subtle); }
+  .cyl-table td[data-label='Customer'] { grid-area: sub; display: grid; grid-template-columns: minmax(0, auto) auto 1fr; gap: 4px var(--space-2); align-items: center; min-width: 0; white-space: nowrap; font-size: var(--text-sm); color: var(--fg-subtle); }
   .cyl-table td[data-label='Customer'] > .muted { display: none; }
   .table__card-only { display: inline; }
   .table__with { display: flex; gap: 0.3em; min-width: 0; }
   .table__with .customer { color: var(--fg-muted); font-weight: var(--weight-medium); }
-  .table__card-time { flex: none; }
+  .table__card-idle:empty { display: none; }
+  .table__card-time { grid-column: 1 / -1; }
   .cyl-table td.table__menu { display: block; grid-area: menu; align-self: start; justify-self: end; }
   .table__menu .menu-trigger { --btn-h: 36px; }
 }
