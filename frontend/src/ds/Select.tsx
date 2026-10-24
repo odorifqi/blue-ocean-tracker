@@ -156,7 +156,7 @@ export function Select<T extends string | number>({
       case 'ArrowUp': {
         e.preventDefault()
         const step = e.key === 'ArrowDown' ? 1 : -1
-        if (!open) openMenu(e.altKey || selectedIndex < 0 ? selectedIndex : selectedIndex)
+        if (!open) openMenu(selectedIndex)
         else if (e.altKey && step === -1) commit(active)
         else setActive((a) => move(a < 0 ? (step === 1 ? -1 : 0) : a, step))
         break
