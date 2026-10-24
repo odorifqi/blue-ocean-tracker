@@ -23,9 +23,46 @@
 }
 .nav__item:hover { background: var(--bg-hover); color: var(--fg-default); text-decoration: none; }
 .nav__item.is-active { background: var(--bg-selected); color: var(--accent-fg); }
-.sidebar__foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-3); padding: 0 var(--space-2); }
-.sidebar__env { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-subtle); }
-.env-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-maintenance-dot); }
+/* Phone menu only: on desktop the theme switch lives in the Miscellaneous panel, so the sidebar has no footer. */
+.sidebar__foot { display: none; flex-direction: column; gap: var(--space-3); }
+/* Under the app name, lined up with its text: it says where the app's data comes from. Neutral, so it
+   can't be read as a cylinder status. */
+.env-badge {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; margin: calc(-1 * var(--space-6) + var(--space-2)) 0 0 48px;
+  height: 20px; padding: 0 8px; border-radius: var(--radius-full); border: 1px dashed var(--border-strong); white-space: nowrap;
+  font-size: 11px; font-weight: var(--weight-medium); color: var(--fg-muted); background: var(--bg-muted);
+}
+
+/* ===== Phone menu ===== */
+/* Desktop shows the nav and footer in the sidebar as they are; these parts exist only on phones. */
+.sidebar__menu { display: contents; }
+.menu-btn, .menu-row__label, .menu-env, .menu-scrim { display: none; }
+@media (max-width: 900px) {
+  .menu-btn {
+    display: grid; place-items: center; margin-left: auto; width: 40px; height: 40px; border: 0; border-radius: var(--radius-md);
+    background: transparent; color: var(--fg-default); cursor: pointer;
+  }
+  .menu-btn:hover, .menu-open .menu-btn { background: var(--bg-hover); }
+  .sidebar__menu { display: none; }
+  .menu-open .sidebar__menu {
+    display: flex; flex-direction: column; gap: var(--space-4); position: absolute; top: 100%; left: 0; right: 0;
+    max-height: calc(100dvh - var(--topbar-h)); overflow: auto;
+    padding: var(--space-3) var(--space-4) var(--space-5); background: var(--bg-surface); border-bottom: 1px solid var(--border-default);
+    box-shadow: var(--shadow-lg); animation: drop-in var(--duration-slow) var(--ease-out);
+  }
+  .menu-open .nav__item { height: 44px; }
+  .sidebar__foot { display: flex; padding: var(--space-4) 0 0; border-top: 1px solid var(--border-subtle); }
+  .menu-row { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-3); }
+  .menu-row__label { display: inline; font-weight: var(--weight-medium); color: var(--fg-muted); }
+  .menu-env {
+    display: flex; align-items: center; gap: var(--space-2); margin: 0 var(--space-3); padding: var(--space-2) var(--space-3);
+    border: 1px dashed var(--border-strong); border-radius: var(--radius-md); background: var(--bg-muted); font-size: var(--text-sm); color: var(--fg-muted);
+  }
+  .menu-env strong { color: var(--fg-default); }
+  .menu-scrim { display: block; position: fixed; inset: var(--topbar-h) 0 0 0; z-index: calc(var(--z-sticky) - 1); background: color-mix(in oklab, black 30%, transparent); animation: fade var(--duration-fast); }
+  /* The Miscellaneous button would float over the open menu's scrim. */
+  .menu-open .kit { display: none; }
+}
 
 .theme-switch { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-muted); border-radius: var(--radius-md); align-self: flex-start; }
 .theme-switch button { display: grid; place-items: center; width: 30px; height: 26px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--fg-subtle); cursor: pointer; }
@@ -43,11 +80,7 @@
 @media (max-width: 900px) {
   .shell { --topbar-h: 56px; grid-template-columns: 1fr; }
   .sidebar { position: sticky; z-index: var(--z-sticky); height: var(--topbar-h); flex-direction: row; align-items: center; padding: var(--space-2) var(--space-4); border-right: 0; border-bottom: 1px solid var(--border-default); gap: var(--space-3); }
-  .brand__text { display: none; }
-  .nav { flex-direction: row; }
-  .nav__item span { display: none; }
-  .sidebar__foot { margin: 0 0 0 auto; flex-direction: row; padding: 0; }
-  .sidebar__env { display: none; }
+  .brand__sub, .env-badge { display: none; }
   .page { padding: var(--space-5) var(--space-4) var(--space-16); gap: var(--space-5); }
   .page__title { font-size: var(--text-2xl); }
   .page__header > .btn { width: 100%; }
