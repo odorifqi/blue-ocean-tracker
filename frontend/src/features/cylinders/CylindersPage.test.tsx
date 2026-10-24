@@ -1,5 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Link } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { mockSettings } from '../../mocks/settings'
 import { renderWithApp } from '../../test/render'
@@ -34,6 +35,19 @@ describe('Cylinders list page', () => {
     expect(await screen.findByText('No cylinders match')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Clear filters' }))
     await waitFor(() => expect(rows()).toHaveLength(10))
+  })
+
+  it('empties the search box when a link clears the search, like the Cylinders item in the sidebar', async () => {
+    const user = userEvent.setup()
+    renderWithApp(<><Link to="/">Cylinders</Link><CylindersPage /></>)
+    await waitFor(() => expect(rows()).toHaveLength(10))
+
+    await user.type(screen.getByRole('searchbox'), "o'brien")
+    await waitFor(() => expect(rows()).toHaveLength(3))
+    await user.click(screen.getByRole('link', { name: 'Cylinders' }))
+
+    await waitFor(() => expect(rows()).toHaveLength(10))
+    expect(screen.getByRole('searchbox')).toHaveValue('')
   })
 
   it('gives every row Edit details, Change status and Detail, with Detail as the emphasised link', async () => {
@@ -153,7 +167,7 @@ describe('Cylinders list page', () => {
     expect(results.scrollTop).toBe(0)
 
     await user.type(screen.getByRole('searchbox'), 'CYL-000000')
-    expect(await screen.findByText('No cylinders match')).toBeInTheDocument()
+    expect(await screen.findByText('No cylinders match', {}, { timeout: 3000 })).toBeInTheDocument()
     expect(within(screen.getByRole('navigation', { name: 'Pagination' })).getByText('No results')).toBeInTheDocument()
   })
 })

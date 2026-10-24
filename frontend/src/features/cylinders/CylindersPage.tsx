@@ -60,6 +60,15 @@ export function CylindersPage() {
     if (debounced !== search.trim()) set({ q: debounced, page: 1 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced])
+
+  // Pull a search changed from outside (the sidebar link, the logo) back into the box. Comparing with the
+  // debounced text, not the draft, leaves letters typed during the debounce alone.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from the URL, an outside source
+    if (search.trim() !== debounced) setSearchDraft(search)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search])
+
   const effectiveSearch = search.trim()
 
   const query = useCylinders({ search: effectiveSearch, status, page, pageSize })
