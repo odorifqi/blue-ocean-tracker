@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { ArrowRight, Repeat2, TriangleAlert } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Dialog, Field, Input, StatusBadge, useToast } from '../../ds'
 import { ApiError, type Cylinder } from '../../lib/api'
 import {
@@ -47,9 +47,13 @@ export function StatusChangeDialog({ cylinder, open, onClose, initialStatus }: P
   const customerError = needsCustomer ? validateCustomerName(customer) : undefined
   const canSubmit = Boolean(target) && !customerError
 
+  // Enter in the customer field can fire twice before React re-renders, so isPending alone is too late.
+  const inFlight = useRef(false)
+
   async function submit() {
     setTouched(true)
-    if (!target || customerError) return
+    if (!target || customerError || inFlight.current) return
+    inFlight.current = true
     try {
       const updated = await mutation.mutateAsync({ status: target, customerName: needsCustomer ? customer.trim() : null })
       toast.success(
@@ -60,6 +64,8 @@ export function StatusChangeDialog({ cylinder, open, onClose, initialStatus }: P
     } catch (err) {
       if (err instanceof ApiError) setServerError(err.fieldError('customerName'))
       showServerError(err, `Couldn’t change the status of ${cylinder.serialNumber}.`)
+    } finally {
+      inFlight.current = false
     }
   }
 

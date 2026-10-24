@@ -69,4 +69,19 @@ describe('Status change', () => {
 
     await waitFor(() => expect(db.find(filled.id)).toMatchObject({ status: 'Delivered', customerName: 'PT Café Nusantara Ünggul' }))
   })
+
+  it('sends one request when Enter is pressed twice, so no false error pop-up follows the success', async () => {
+    const user = userEvent.setup()
+    const filled = db.all().find((c) => c.status === 'Filled')!
+    renderWithApp(<StatusChangeDialog open cylinder={filled} onClose={() => {}} />)
+
+    await user.click(screen.getByRole('radio', { name: /Delivered/ }))
+    await user.type(screen.getByRole('textbox', { name: /Received by/ }), 'PT Sinar Abadi')
+    await user.keyboard('{Enter}{Enter}')
+
+    await waitFor(() => expect(db.find(filled.id)).toMatchObject({ status: 'Delivered' }))
+    await new Promise((r) => setTimeout(r, 300))
+    expect(db.history(filled.id).filter((e) => e.type === 'status')).toHaveLength(1)
+    expect(screen.queryByText('Invalid status transition')).not.toBeInTheDocument()
+  })
 })
