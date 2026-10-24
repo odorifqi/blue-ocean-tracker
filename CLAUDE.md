@@ -70,8 +70,8 @@ backend/Cylinders.Api.Tests/      xUnit integration tests; each test gets its ow
 - Dialogs use the native `<dialog>` element for focus trapping and Esc. Don't hand-roll a modal.
 - Accessibility is non-optional: labelled fields, `aria-describedby` for hints/errors, radiogroup
   semantics for filters, text alternatives for the diagram, `prefers-reduced-motion`.
-- Commits: Conventional Commits with a ticket scope — `feat(OD-1): init`. Only one commit exists so far,
-  so this is a thin sample.
+- Commits: Conventional Commits with a ticket scope, e.g. `feat(OD-1): add the cylinder minimal API endpoints`.
+- Remote: https://github.com/odorifqi/blue-ocean-tracker
 
 ## Known Gaps
 
