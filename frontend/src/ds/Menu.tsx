@@ -36,6 +36,7 @@ export function Menu({ label, items, className }: MenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
+  const focusFrame = useRef(0)
   const [pos, setPos] = useState<{ top: number; left: number; placement: 'bottom' | 'top' }>()
 
   const place = useCallback(() => {
@@ -53,13 +54,15 @@ export function Menu({ label, items, className }: MenuProps) {
   const openMenu = (focus: 'first' | 'last' = 'first') => {
     place()
     setOpen(true)
-    requestAnimationFrame(() => {
+    focusFrame.current = requestAnimationFrame(() => {
       const list = enabled()
       ;(focus === 'first' ? list[0] : list[list.length - 1])?.focus()
     })
   }
 
   const close = (focusTrigger = true) => {
+    // A close before the deferred focus lands must not let it pull focus into the hidden menu.
+    cancelAnimationFrame(focusFrame.current)
     setOpen(false)
     if (focusTrigger) triggerRef.current?.focus()
   }
@@ -93,6 +96,12 @@ export function Menu({ label, items, className }: MenuProps) {
   }, [open, place])
 
   const onTriggerKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    // Focus moves into the menu a frame after opening; an Escape pressed before then still lands here.
+    if (e.key === 'Escape' && open) {
+      e.preventDefault()
+      close()
+      return
+    }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault()
       openMenu(e.key === 'ArrowDown' ? 'first' : 'last')
