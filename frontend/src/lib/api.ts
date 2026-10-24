@@ -148,7 +148,17 @@ function defaultTitle(status: number) {
 
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? ''
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+// Set by main.tsx in mock mode. Browsers stop an idle service worker and start it again on the
+// next request; MSW's worker then forgets this tab and lets requests through to the host, which
+// answers with index.html. Re-registering the tab makes the mock answer again.
+let reconnectMock: (() => Promise<void>) | undefined
+let reconnecting: Promise<void> | undefined
+
+export function setMockReconnect(fn: () => Promise<void>) {
+  reconnectMock = fn
+}
+
+async function request<T>(path: string, init?: RequestInit, isRetry = false): Promise<T> {
   let res: Response
   try {
     res = await fetch(`${BASE}${path}`, {
@@ -163,7 +173,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) throw new ApiError(res.status, (json as object | undefined) ?? (text ? { detail: text } : {}))
   // A 2xx that isn't JSON is a host's fallback page (Vercel answers unknown paths with
   // index.html), not data. Treat it as a failed request instead of handing HTML to a page.
-  if (text && json === undefined) throw unexpectedResponse(res.status)
+  if (text && json === undefined) {
+    if (reconnectMock && !isRetry) {
+      // The request never reached the mock, so sending it again is safe, even for a POST.
+      reconnecting ??= reconnectMock().finally(() => (reconnecting = undefined))
+      await reconnecting.catch(() => {})
+      return request<T>(path, init, true)
+    }
+    throw unexpectedResponse(res.status)
+  }
   return json as T
 }
 
