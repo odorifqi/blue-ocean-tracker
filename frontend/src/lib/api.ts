@@ -159,17 +159,42 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(0, { detail: 'Check your connection and try again.' })
   }
   const text = await res.text()
-  const body = text ? safeJson(text) : undefined
-  if (!res.ok) throw new ApiError(res.status, (body as object) ?? {})
-  return body as T
+  const json = text ? parseJson(text) : undefined
+  if (!res.ok) throw new ApiError(res.status, (json as object | undefined) ?? (text ? { detail: text } : {}))
+  // A 2xx that isn't JSON is a host's fallback page (Vercel answers unknown paths with
+  // index.html), not data. Treat it as a failed request instead of handing HTML to a page.
+  if (text && json === undefined) throw unexpectedResponse(res.status)
+  return json as T
 }
 
-function safeJson(text: string) {
+function parseJson(text: string): unknown {
   try {
     return JSON.parse(text)
   } catch {
-    return { detail: text }
+    return undefined
   }
+}
+
+/** A successful status with a body that isn't what the contract promises. */
+function unexpectedResponse(status: number) {
+  return new ApiError(status, {
+    title: 'Unexpected response',
+    detail: 'The server answered, but not with the data this page needs.',
+  })
+}
+
+// The rules page renders straight from these, so a body missing one becomes an
+// error state with a retry here rather than a crash in the middle of a render.
+function checkMeta(m: Meta) {
+  const ok =
+    m != null &&
+    Array.isArray(m.gasTypes) &&
+    Array.isArray(m.statuses) &&
+    Array.isArray(m.statusRules) &&
+    typeof m.transitions === 'object' &&
+    m.transitions !== null
+  if (!ok) throw unexpectedResponse(200)
+  return m
 }
 
 export const api = {
@@ -183,7 +208,7 @@ export const api = {
   },
   summary: () => request<Summary>('/api/cylinders/summary'),
   analytics: () => request<Analytics>('/api/cylinders/analytics'),
-  meta: () => request<Meta>('/api/meta'),
+  meta: () => request<Meta>('/api/meta').then(checkMeta),
   history(id: number, params: HistoryParams = {}) {
     const q = new URLSearchParams()
     if (params.type && params.type !== 'all') q.set('type', params.type)
