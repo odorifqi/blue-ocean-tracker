@@ -67,7 +67,7 @@
 
 .search input::-webkit-search-cancel-button { display: none; }
 .search__icon.is-busy { animation: pulse 1s ease-in-out infinite; }
-.search__clear { display: grid; place-items: center; width: 22px; height: 22px; border: 0; border-radius: var(--radius-full); background: var(--bg-muted); color: var(--fg-muted); cursor: pointer; }
+.search__clear { display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-full); background: var(--bg-muted); color: var(--fg-muted); cursor: pointer; }
 .search__clear:hover { color: var(--fg-default); }
 @keyframes pulse { 50% { opacity: 0.35; } }
 
