@@ -45,11 +45,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             await Database.EnsureDeletedAsync();
             await Database.EnsureCreatedAsync();
         }
-        foreach (var op in new[] { "UPDATE", "DELETE" })
-            await Database.ExecuteSqlRawAsync($$"""
-                CREATE TRIGGER IF NOT EXISTS cylinder_events_no_{{op.ToLowerInvariant()}}
-                BEFORE {{op}} ON cylinder_events
-                BEGIN SELECT RAISE(ABORT, 'History is append-only.'); END;
-                """);
+        await Database.ExecuteSqlRawAsync("""
+            CREATE TRIGGER IF NOT EXISTS cylinder_events_no_update
+            BEFORE UPDATE ON cylinder_events
+            BEGIN SELECT RAISE(ABORT, 'History is append-only.'); END;
+            """);
+        await Database.ExecuteSqlRawAsync("""
+            CREATE TRIGGER IF NOT EXISTS cylinder_events_no_delete
+            BEFORE DELETE ON cylinder_events
+            BEGIN SELECT RAISE(ABORT, 'History is append-only.'); END;
+            """);
     }
 }
