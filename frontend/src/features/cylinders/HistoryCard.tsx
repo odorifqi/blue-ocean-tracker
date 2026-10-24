@@ -1,5 +1,5 @@
 import { ArrowLeftRight, CirclePlus, FileDown, History, PencilLine } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Button, EmptyState, ErrorState, FilterPills, Pagination, Skeleton, StatusBadge } from '../../ds'
 import type { HistoryEvent, HistoryFilter, HistorySummary } from '../../lib/api'
@@ -56,6 +56,8 @@ export function HistoryCard({ cylinderId }: { cylinderId: number }) {
       { replace: true, preventScrollReset: true },
     )
 
+  const cardRef = useRef<HTMLElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
   const items = data?.items ?? []
   const lastPage = data ? page * PAGE_SIZE >= data.totalCount : false
   const importedOnly = items.at(-1)?.type === 'imported' && lastPage && type === 'all'
@@ -102,7 +104,7 @@ export function HistoryCard({ cylinderId }: { cylinderId: number }) {
   }
 
   return (
-    <section className="card detail-card history" aria-labelledby="history-h">
+    <section ref={cardRef} className="card detail-card history" aria-labelledby="history-h">
       <div className="history__head">
         <div className="card__head">
           <h2 id="history-h" className="card__title">History</h2>
@@ -111,7 +113,8 @@ export function HistoryCard({ cylinderId }: { cylinderId: number }) {
         <FilterPills label="Show events" options={FILTERS} value={type} onChange={(t) => setView({ type: t })} />
       </div>
       <SummaryStrip summary={data?.summary} failed={Boolean(error && !data)} />
-      <div className="history__body" aria-busy={query.isFetching || undefined}>{body}</div>
+      {/* Focusable so a page change can hand focus to the first event (see Pagination). */}
+      <div ref={bodyRef} className="history__body" tabIndex={-1} aria-busy={query.isFetching || undefined}>{body}</div>
       {data && data.totalCount > PAGE_SIZE && (
         <Pagination
           page={page}
@@ -119,6 +122,8 @@ export function HistoryCard({ cylinderId }: { cylinderId: number }) {
           totalCount={data.totalCount}
           onPageChange={(p) => setView({ page: p })}
           disabled={query.isFetching}
+          scrollTarget={cardRef}
+          focusTarget={bodyRef}
         />
       )}
     </section>

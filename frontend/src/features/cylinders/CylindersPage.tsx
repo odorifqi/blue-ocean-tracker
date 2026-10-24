@@ -87,6 +87,7 @@ export function CylindersPage() {
 
   // A new result set starts at its first row, and the column header lifts once rows pass under it.
   const bodyRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLElement>(null)
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = 0
   }, [page, pageSize, status, effectiveSearch])
@@ -120,7 +121,7 @@ export function CylindersPage() {
         <IdleBanner count={summary.data.idle} onView={() => set({ status: 'Delivered', page: 1 })} />
       )}
 
-      <section className="card list enter" style={{ '--i': 2 } as CSSProperties} aria-label="Cylinder list">
+      <section ref={listRef} className="card list enter" style={{ '--i': 2 } as CSSProperties} aria-label="Cylinder list">
         <div className="list__toolbar">
           <SearchInput
             value={searchDraft}
@@ -201,6 +202,8 @@ export function CylindersPage() {
             onPageChange={(p) => set({ page: p })}
             onPageSizeChange={(s) => set({ pageSize: s, page: 1 })}
             pageSizes={PAGE_SIZES}
+            scrollTarget={listRef}
+            focusTarget={bodyRef}
           />
         </footer>
       </section>
