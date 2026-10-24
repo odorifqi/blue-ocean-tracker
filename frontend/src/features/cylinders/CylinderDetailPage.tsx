@@ -86,7 +86,14 @@ export function CylinderDetailPage() {
               className="copy-btn"
               aria-label="Copy serial number"
               title="Copy serial number"
-              onClick={() => navigator.clipboard?.writeText(c.serialNumber).then(() => toast.success('Copied', c.serialNumber))}
+              onClick={() => {
+                // The clipboard is refused on insecure origins or when permission is denied; say so instead of failing silently.
+                const copy = navigator.clipboard?.writeText(c.serialNumber) ?? Promise.reject(new Error('Clipboard unavailable'))
+                copy.then(
+                  () => toast.success('Copied', c.serialNumber),
+                  () => toast.error('Couldn’t copy', 'Select the serial number and copy it by hand.'),
+                )
+              }}
             >
               <Copy size={16} />
             </button>
