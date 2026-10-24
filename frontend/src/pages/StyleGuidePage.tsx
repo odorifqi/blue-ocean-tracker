@@ -174,7 +174,7 @@ export function StyleGuidePage() {
           <p className="page__eyebrow">Design library · v1.0</p>
           <h1 className="page__title">Design system</h1>
           <p className="page__subtitle">
-            Tokens and components behind the Cylinder Tracker. Everything here is the live component the app uses. Use the theme switch at the top right to see dark mode.
+            Tokens and components behind Blue Ocean Tracker. Everything here is the live component the app uses. Use the theme switch at the top right to see dark mode.
           </p>
         </div>
       </header>

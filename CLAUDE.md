@@ -1,4 +1,4 @@
-# Project Instructions — Cylinder Tracker
+# Project Instructions — Blue Ocean Tracker
 
 Gas-cylinder lifecycle tracker.
 Two independent halves: `frontend/` (the main deliverable) and `backend/`.

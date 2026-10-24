@@ -1,5 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 
+export const APP_NAME = 'Blue Ocean Tracker'
+
 export function useDebounced<T>(value: T, ms = 300) {
   const [v, setV] = useState(value)
   useEffect(() => {

@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { BarChart3, Boxes, Workflow } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { APP_NAME } from '../lib/hooks'
 import { BrandMark } from './Brand'
 import { ReviewerKit } from './ReviewerKit'
 import { ThemeSwitch } from './ThemeSwitch'
@@ -16,7 +17,7 @@ export function Layout({ mock }: { mock: boolean }) {
         <NavLink to="/" className="brand">
           <BrandMark />
           <span className="brand__text">
-            <span className="brand__name">Cylinder Tracker</span>
+            <span className="brand__name">{APP_NAME}</span>
             <span className="brand__sub">Gas asset lifecycle</span>
           </span>
         </NavLink>

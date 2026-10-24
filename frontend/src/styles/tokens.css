@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SMTR design tokens
+   Blue Ocean Tracker design tokens
    Three tiers: primitives (raw palette) -> semantic (role-based) -> component.
    Components only ever read semantic tokens, so themes swap one layer.
    ========================================================================== */

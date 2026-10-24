@@ -1,6 +1,9 @@
-# Cylinder Tracker
+# Blue Ocean Tracker
 
 A web app that tracks gas cylinders through their lifecycle: filling, delivery, return, maintenance and retirement.
+
+- **Live app:** https://blue-ocean-tracker.vercel.app
+- **Repository:** https://github.com/odorifqi/blue-ocean-tracker
 
 **What's in this repo**
 

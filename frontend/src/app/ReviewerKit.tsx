@@ -28,7 +28,7 @@ export function ReviewerKit({ mock }: { mock: boolean }) {
             <span><SlidersHorizontal size={15} aria-hidden /> Miscellaneous</span>
             <IconButton label="Close miscellaneous panel" size="sm" onClick={() => setOpen(false)}><X size={16} /></IconButton>
           </header>
-          <p className="kit__note">Shortcuts and display settings that live outside the main Cylinder Tracker screens.</p>
+          <p className="kit__note">Shortcuts and display settings that live outside the main Blue Ocean Tracker screens.</p>
 
           <Link to="/design-system" className="kit__link" onClick={() => setOpen(false)}>
             <span className="kit__link-icon"><Palette size={18} /></span>

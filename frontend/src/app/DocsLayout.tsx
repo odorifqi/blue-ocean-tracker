@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link, Outlet } from 'react-router-dom'
+import { APP_NAME } from '../lib/hooks'
 import { BrandMark } from './Brand'
 import { ThemeSwitch } from './ThemeSwitch'
 
@@ -17,7 +18,7 @@ export function DocsLayout() {
           </Link>
           <span className="docs-bar__title">
             <BrandMark size={22} />
-            <span>Cylinder Tracker</span>
+            <span>{APP_NAME}</span>
             <span className="docs-bar__sep" aria-hidden>/</span>
             <strong>Design system</strong>
           </span>
