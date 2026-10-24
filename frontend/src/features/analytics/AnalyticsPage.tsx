@@ -75,7 +75,8 @@ function AnalyticsBody({ a }: { a: Analytics }) {
   const inUse = a.byStatus.Filled + a.byStatus.Delivered
   const idleShare = a.byStatus.Delivered ? a.idle / a.byStatus.Delivered : 0
   const gasByTotal = [...a.byGas].sort((x, y) => y.total - x.total)
-  const gasRow = (g: GasType) => a.byGas.find((x) => x.gasType === g)!
+  // Falls back to an empty row if the API ever lists a different set of gases.
+  const gasRow = (g: GasType) => a.byGas.find((x) => x.gasType === g) ?? { gasType: g, total: 0, byStatus: { Empty: 0, Filled: 0, Delivered: 0, InMaintenance: 0, Retired: 0 } }
   const gasInService = (g: GasType) => gasRow(g).total - gasRow(g).byStatus.Retired
 
   return (
