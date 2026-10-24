@@ -466,17 +466,21 @@
 .lifecycle__node.status--delivered { --s-dot: var(--status-delivered-dot); --s-bg: var(--status-delivered-bg); --s-fg: var(--status-delivered-fg); }
 .lifecycle__node.status--maintenance { --s-dot: var(--status-maintenance-dot); --s-bg: var(--status-maintenance-bg); --s-fg: var(--status-maintenance-fg); }
 .lifecycle__node.status--retired { --s-dot: var(--status-retired-dot); --s-bg: var(--status-retired-bg); --s-fg: var(--status-retired-fg); }
-.lifecycle__node.is-current rect { fill: var(--s-bg); stroke: var(--s-dot); stroke-width: 2.5; }
-.lifecycle__node.is-current text { fill: var(--s-fg); font-weight: 700; }
-.lifecycle__node.is-next rect { fill: var(--accent-subtle); stroke: var(--accent); stroke-width: 1.5; }
+/* Current is the one solid pill ("you are here"); allowed next steps are dashed ("not yet").
+   Fill and line style tell them apart without hue, which matters for Filled: sky and the accent blue sit 22° apart.
+   The status -fg shade is dark in light mode and light in dark mode, so --fg-inverse text clears 6:1 on every status. */
+.lifecycle__node.is-current rect { fill: var(--s-fg); stroke: var(--s-fg); stroke-width: 2; }
+.lifecycle__node.is-current text { fill: var(--fg-inverse); font-weight: 700; }
+.lifecycle__node.is-current .lifecycle__dot { fill: var(--fg-inverse); }
+.lifecycle__node.is-next rect { fill: var(--bg-surface); stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 6 4; }
 .lifecycle__node.is-next text { fill: var(--fg-default); font-weight: 600; }
 .lifecycle__node.is-interactive { cursor: pointer; outline: none; }
-.lifecycle__node.is-interactive:hover rect, .lifecycle__node.is-interactive:focus-visible rect { fill: var(--bg-surface); stroke-width: 2.5; }
+.lifecycle__node.is-interactive:hover rect, .lifecycle__node.is-interactive:focus-visible rect { fill: var(--accent-subtle); stroke-dasharray: none; stroke-width: 2.5; }
 .lifecycle-legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; list-style: none; font-size: var(--text-xs); color: var(--fg-muted); }
 .lifecycle-legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
 .lifecycle-legend i { display: inline-block; width: 22px; }
-.lifecycle-legend__current { height: 12px; border-radius: var(--radius-full); background: var(--s-bg, var(--status-empty-bg)); border: 2px solid var(--s-dot, var(--status-empty-dot)); }
-.lifecycle-legend__next { height: 12px; border-radius: var(--radius-full); background: var(--accent-subtle); border: 1.5px solid var(--accent); }
+.lifecycle-legend__current { height: 12px; border-radius: var(--radius-full); background: var(--s-fg, var(--status-empty-fg)); }
+.lifecycle-legend__next { height: 12px; border-radius: var(--radius-full); background: var(--bg-surface); border: 1.5px dashed var(--accent); }
 .lifecycle-legend__move { height: 2px; background: var(--accent); }
 .lifecycle-legend__other { height: 1.5px; background: var(--border-strong); }
 

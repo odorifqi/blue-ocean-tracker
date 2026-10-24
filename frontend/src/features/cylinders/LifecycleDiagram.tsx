@@ -45,7 +45,8 @@ export function LifecycleDiagram({ current, onSelect, className }: Props) {
     <svg
       className={clsx('lifecycle', className)}
       viewBox="0 18 680 274"
-      role="img"
+      // A group, not an image: the allowed next steps inside are real buttons that screen readers must reach.
+      role="group"
       aria-label={
         current
           ? `Lifecycle diagram. Current status ${STATUS_LABEL[current]}. ${next.length ? `Can move to ${next.map((s) => STATUS_LABEL[s]).join(', ')}.` : 'No further moves.'}`
