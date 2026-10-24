@@ -73,7 +73,7 @@ const HISTORY_FILTERS = {
 function summarise(events: HistoryEvent[]): HistoryPage['summary'] {
   const customers = new Set(events.flatMap((e) => (e.customerName ? [e.customerName.trim().toUpperCase()] : [])))
   return {
-    trackedSince: events.at(-1)?.at ?? '',
+    trackedSince: events.at(-1)?.at ?? null,
     deliveries: events.filter((e) => e.type === 'status' && e.toStatus === 'Delivered').length,
     customers: customers.size,
     lastEdited: events.find((e) => e.type === 'edited')?.at ?? null,

@@ -63,7 +63,7 @@ export interface HistoryEvent {
 }
 
 export interface HistorySummary {
-  trackedSince: string
+  trackedSince: string | null
   deliveries: number
   customers: number
   lastEdited: string | null
